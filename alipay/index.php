@@ -10,10 +10,14 @@
     ));
     $data = $pay->pay(array(
         'out_trade_no' => $out_trade_no,
-        'total_amount' => 0.01,    //订单金额，元
-        'subject' => 'iPad',    //订单标题
-        'body' => 'iPad 16G 中国版',    //订单描述
-        'auth_code' => '284279130595680070',    //扫描手机条码值
+        'total_amount' => 0.01,
+        //订单金额，元
+        'subject' => 'iPad',
+        //订单标题
+        'body' => 'iPad 16G 中国版',
+        //订单描述
+        'auth_code' => '284279130595680070',
+        //扫描手机条码值
     ));
     var_dump($data);
     $data = $pay->query(array(

@@ -29,7 +29,7 @@
         public function load($data) {
             $this->__settings['rowTotal'] += count($data);
             $this->__settings['pageTotal'] += 1;
-            file_put_contents($this->__cache_identity . '.' . $this->__settings['pageTotal']. '.json', json_encode($data));
+            file_put_contents($this->__cache_identity . '.' . $this->__settings['pageTotal'] . '.json', json_encode($data));
         }
 
         public function create() {
@@ -45,7 +45,7 @@
                 $data = file_get_contents($this->__cache_identity . '.' . $page . '.json');
                 $data = json_decode($data, true);
                 foreach ($data as $key => $row) {
-                    fwrite($this->__file_data, implode(',', $row).PHP_EOL);
+                    fwrite($this->__file_data, implode(',', $row) . PHP_EOL);
                 }
             }
             fclose($this->__file_data);
@@ -53,7 +53,7 @@
 
         private function __writeTitle() {
             $this->__file_data = fopen($this->__cache_identity, 'a');
-            fwrite($this->__file_data, implode(',', $this->__settings['column']).PHP_EOL);
+            fwrite($this->__file_data, implode(',', $this->__settings['column']) . PHP_EOL);
             fclose($this->__file_data);
         }
 
@@ -75,7 +75,7 @@
             $directory = $this->__settings['cache'];
             $cache = scandir($directory);
             $identity = $this->__file_identity;
-            
+
             array_map(function ($file) use ($directory, $identity) {
                 if (stripos($file, $identity) !== false) {
                     unlink($directory . DIRECTORY_SEPARATOR . $file);

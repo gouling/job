@@ -176,11 +176,13 @@
                     'err_code_id' => $data['return_code'],
                     'err_code_des' => $data['return_msg'],
                 );
-            } else if (strcasecmp($data['result_code'], 'SUCCESS') != 0) {
-                $data = array(
-                    'err_code_id' => $data['err_code'],
-                    'err_code_des' => $data['err_code_des'],
-                );
+            } else {
+                if (strcasecmp($data['result_code'], 'SUCCESS') != 0) {
+                    $data = array(
+                        'err_code_id' => $data['err_code'],
+                        'err_code_des' => $data['err_code_des'],
+                    );
+                }
             }
             if (!isset($data['err_code_id'])) {
                 switch ($action) {

@@ -1,4 +1,5 @@
 <?php
+
     namespace Api\Information;
 
     class CRedis {
@@ -7,11 +8,11 @@
 
 
         public function __construct() {
-            $this->__setting=include('setting.php');
+            $this->__setting = include('setting.php');
 
-            if(!is_object(self::$redis)) {
+            if (!is_object(self::$redis)) {
                 self::$redis = new \Redis();
-                if(C('MOVIE_INTERFACE.DEV_MODE')==true) {
+                if (C('MOVIE_INTERFACE.DEV_MODE') == true) {
                     self::$redis->pconnect(C('REDIS_HOST'), C('REDIS_PORT'));
                 } else {
                     self::$redis->pconnect($this->__setting['sock']);
@@ -32,10 +33,11 @@
 
         public function UKey($identity, $binary) {
             $this->send($this->__setting['prefix']['key']['send'], $identity, $binary);
-            if($data=$this->accept($this->__setting['prefix']['key']['accept'], $identity)) {
+            if ($data = $this->accept($this->__setting['prefix']['key']['accept'], $identity)) {
                 return $data;
             } else {
                 $this->hDel($this->__setting['prefix']['key']['send'], $identity);
+
                 return false;
             }
         }
@@ -45,11 +47,11 @@
         }
 
         public function accept($key, $identity) {
-            $refer=false;
-            $timeout=$this->__setting['timeout']*30000;
+            $refer = false;
+            $timeout = $this->__setting['timeout'] * 30000;
 
-            for($second=0; $second<$timeout; $second++) {
-                if($refer=$this->hGet($key, $identity)) {
+            for ($second = 0; $second < $timeout; $second++) {
+                if ($refer = $this->hGet($key, $identity)) {
                     break;
                 } else {
                     usleep(10);
@@ -60,9 +62,9 @@
         }
 
         public function getBinaryList($prefix, $data) {
-            if($refer=$this->hGetAll($prefix)) {
+            if ($refer = $this->hGetAll($prefix)) {
                 $this->Expire($data);
-                foreach($refer as $key=>$val) {
+                foreach ($refer as $key => $val) {
                     $this->hSet($data, $key, $val);
                     $this->hDel($prefix, $key); //不直接移除是因为C移除后无法写入
                 }
@@ -77,11 +79,11 @@
             self::$redis->hSet($key, $field, $val);
         }
 
-        public function hGet($key, $field, $is_del=true) {
-            $data=false;
-            if(self::$redis->hExists($key, $field)) {
-                $data=self::$redis->hGet($key, $field);
-                if($is_del) {
+        public function hGet($key, $field, $is_del = true) {
+            $data = false;
+            if (self::$redis->hExists($key, $field)) {
+                $data = self::$redis->hGet($key, $field);
+                if ($is_del) {
                     $this->hDel($key, $field);
                 }
             }
@@ -89,7 +91,7 @@
             return $data;
         }
 
-        public function Expire($prefix, $time=600) {
+        public function Expire($prefix, $time = 600) {
             self::$redis->expire($prefix, $time);
         }
 
