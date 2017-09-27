@@ -85,10 +85,10 @@
 
             $length=array(
                 'call'=>pack('i', strlen($call)),
-                'binary'=>pack('i', strlen($binary))
+                'cinema'=>pack('i', strlen($binary))
             );
 
-            return $length['call'].$call.$length['binary'].$binary;
+            return $length['call'].$call.$length['cinema'].$binary;
         }
 
         static function CVerify_dataEx($data) {
@@ -121,10 +121,10 @@
 
             $length=array(
                 'call'=>pack('i', strlen($call)),
-                'binary'=>pack('i', strlen($binary))
+                'cinema'=>pack('i', strlen($binary))
             );
 
-            return $length['call'].$call.$length['binary'].$binary;
+            return $length['call'].$call.$length['cinema'].$binary;
         }
 
         static function Crc($data) {
@@ -133,9 +133,9 @@
 
             $length=array(
                 'call'=>pack('i', strlen($call)),
-                'binary'=>pack('i', strlen($binary))
+                'cinema'=>pack('i', strlen($binary))
             );
 
-            return $length['call'].$call.$length['binary'].$binary;
+            return $length['call'].$call.$length['cinema'].$binary;
         }
     }
