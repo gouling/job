@@ -6,7 +6,7 @@
         'appid' => 'wxae622eeaaad0b8b7',
         'mch_id' => '1250292701',
         'trade_type' => 'NATIVE',
-        'notify_url' => 'http://127.0.0.1/notify.php'
+        'notify_url' => 'http://127.0.0.1/notifyn.php'
         //异步通知地址
     ), array(
             'api' => 'https://api.mch.weixin.qq.com/pay/unifiedorder',
