@@ -1,6 +1,6 @@
 <?php
-    //createPhar('notifyn.phar');
-    //createCode('notifyn.phar', 'library');
+    //createPhar('notify.phar');
+    //createCode('notify.phar', 'library');
 
     function createPhar($name) {
         if(file_exists($name)) {

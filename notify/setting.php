@@ -35,11 +35,11 @@
                 'name' => '通知微宝->管理费结算信息',
                 'request' => array(
                     'method' => 'get',
-                    'address' => 'http://notifyn.com/request.php'
+                    'address' => 'http://notify.com/request.php'
                 ),
                 'response' => array(
                     'method' => 'post',
-                    'address' => 'http://notifyn.com/response.php',
+                    'address' => 'http://notify.com/response.php',
                 ),
                 'status' => true,
             ),
@@ -47,11 +47,11 @@
                 'name' => '通知微宝->管理费结算信息',
                 'request' => array(
                     'method' => 'post',
-                    'address' => 'http://notifyn.com/request.php'
+                    'address' => 'http://notify.com/request.php'
                 ),
                 'response' => array(
                     'method' => 'get',
-                    'address' => 'http://notifyn.com/response.php',
+                    'address' => 'http://notify.com/response.php',
                 ),
                 'status' => false,
             ),
@@ -59,11 +59,11 @@
                 'name' => '通知微宝->管理费结算信息',
                 'request' => array(
                     'method' => 'get',
-                    'address' => 'http://notifyn.com/request.php'
+                    'address' => 'http://notify.com/request.php'
                 ),
                 'response' => array(
                     'method' => 'get',
-                    'address' => 'http://notifyn.com/response.php',
+                    'address' => 'http://notify.com/response.php',
                 ),
                 'status' => false,
             ),
