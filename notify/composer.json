@@ -5,10 +5,8 @@
       "url": "https://packagist.phpcomposer.com"
     }
   },
-
   "require": {
   },
-
   "autoload": {
     "psr-4": {
       "helpers\\": "helpers/",
