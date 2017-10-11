@@ -12,6 +12,7 @@ status() {
     for key in ${list[@]}
     do
         name=$(read $key name)
+        desc=$(read $key desc)
         service=$(read $key service)
         stat=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
         if [ -z $stat ]; then
@@ -24,7 +25,7 @@ status() {
             esac
         fi
 
-        echo "${name}，service is ${id}。"
+        echo "${name}(${desc})，service is ${id}。"
     done
 }
 
