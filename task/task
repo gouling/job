@@ -4,8 +4,8 @@ read() {
     section=$1
     item=$2
 
-    val=`awk -F '=' '/\['$section'\]/{a=1}a==1&&$1~/'$item'/{print $2;exit}' $config`
-    echo $val
+    val=`awk -F '=' '/\['${section}'\]/{a=1}a==1&&$1~/'${item}'/{print $0;exit}' ${config}`
+    echo $val | sed "s/${item}\=//g"
 }
 
 status() {
@@ -25,7 +25,7 @@ status() {
             esac
         fi
 
-        echo "${name}(${desc})，service is ${id}。"
+        echo "${name}[${desc}]，service is ${id}。"
     done
 }
 
