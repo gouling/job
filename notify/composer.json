@@ -1,0 +1,18 @@
+{
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
+    }
+  },
+
+  "require": {
+  },
+
+  "autoload": {
+    "psr-4": {
+      "helpers\\": "helpers/",
+      "thread\\": "thread/"
+    }
+  }
+}
