@@ -1,0 +1,11 @@
+#!/bin/bash
+cd /tmp
+
+pkill zookeeper
+pkill hbase
+
+/usr/share/zookeeper-3.4.10/bin/zkServer.sh start
+sleep 5
+/usr/share/hbase-1.2.6/bin/start-hbase.sh
+sleep 5
+/usr/share/hbase-1.2.6/bin/hbase thrift start

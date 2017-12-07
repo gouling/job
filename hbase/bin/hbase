@@ -1,0 +1,36 @@
+#!/usr/bin/env /usr/share/php-7.1.11/bin/php
+
+<?php
+    $data = getopt('', [
+        'option:',
+        'name:'
+    ]);
+
+    switch ($data['option']) {
+        case 'zip':
+            createPhar($data['name']);
+            break;
+        case 'unzip':
+            createCode($data['name'], 'library');
+    }
+
+    function createPhar($name) {
+        if (file_exists(__DIR__ . '/../' . $name)) {
+            unlink(__DIR__ . '/../' . $name);
+        }
+
+        $phar = new Phar($name, 0, $name);
+        $phar->buildFromDirectory(__DIR__ . '/../library');
+        $phar->setDefaultStub('index.php', 'index.php');
+        $phar->compressFiles(Phar::GZ);
+    }
+
+    function createCode($name, $dir) {
+        $name = __DIR__ . '/../' . $name;
+
+        if (file_exists($name)) {
+            $phar = new Phar($name);
+            $phar->convertToData(Phar::ZIP);
+            unlink($name);
+        }
+    }
