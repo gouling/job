@@ -11,7 +11,7 @@
             createPhar($data['name']);
             break;
         case 'unzip':
-            createCode($data['name'], 'library');
+            createCode($data['name'], 'lib');
     }
 
     function createPhar($name) {
@@ -20,7 +20,7 @@
         }
 
         $phar = new Phar($name, 0, $name);
-        $phar->buildFromDirectory(__DIR__ . '/../library');
+        $phar->buildFromDirectory(__DIR__ . '/../lib');
         $phar->setDefaultStub('index.php', 'index.php');
         $phar->compressFiles(Phar::GZ);
     }
