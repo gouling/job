@@ -1,11 +1,37 @@
 #!/bin/bash
-cd /tmp
 
-pkill zookeeper
-pkill hbase
+status() {
+    ps aux | grep /usr/share/jdk-1.8.0.152/bin/java | grep -v grep | awk '{print $2$12}'
+}
 
-/usr/share/zookeeper-3.4.10/bin/zkServer.sh start
-sleep 5
-/usr/share/hbase-1.2.6/bin/start-hbase.sh
-sleep 5
-/usr/share/hbase-1.2.6/bin/hbase thrift start
+start() {
+    /usr/share/zookeeper-3.4.10/bin/zkServer.sh start
+    /usr/share/hbase-1.2.6/bin/start-hbase.sh
+    /usr/share/hbase-1.2.6/bin/hbase-daemon.sh start thrift
+}
+
+stop() {
+    echo 'Stopped...'
+    status
+    ps aux | grep /usr/share/jdk-1.8.0.152/bin/java | grep -v grep | awk '{print $2}' | xargs kill -s 9 >/dev/null 2>&1
+    sleep 5
+    echo 'Stopped。'
+}
+
+restart() {
+	stop
+	start
+}
+
+if [ -z $1 ]; then
+	echo 'Please enter the service for [stop|start|restart|status]'
+else
+    cd /tmp
+    case $1 in
+        'status') status;;
+        'start') start;;
+        'stop') stop;;
+		'restart') restart;;
+        *) echo 'Please enter the service for [stop|start|restart|status]';;
+    esac
+fi
