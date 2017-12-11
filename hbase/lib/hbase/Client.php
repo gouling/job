@@ -18,9 +18,35 @@
             $this->__transport->open();
         }
 
-        public function search($table, $startRow, $stopRow, $column = [], $nbRows = 10) {
-            $id = $this->__client->scannerOpenWithStop($table, $startRow, $stopRow, $column, []);
-            return $this->__client->scannerGet($id);
+        /**
+         * 条件支持 AND OR，比较支持 = >= <= !=
+         * PrefixFilter('1') 行K等于1的记录
+         * ValueFilter(=,'binary:芶凌') 值等于芶凌的行K、字段、值
+         * ValueFilter(=,'substring:芶凌') 值包含芶凌的行K、字段、值
+         * ColumnPrefixFilter('realname') AND ValueFilter(=,'substring:芶凌') 字段realname包含芶凌的行K、字段、值
+         * SingleColumnValueFilter('info', 'realname', =, 'substring:芶凌') 字段info:realname包含芶凌的记录
+         * @param $table
+         * @param array $filter
+         * @param int $nbRows
+         * @return array
+         */
+        public function search($table, $filter = [], $nbRows = 10) {
+            $scan = new TScan([
+                'filterString' => "PrefixFilter('1')"
+            ]);
+
+            $list = [];
+            $id = $this->__client->scannerOpenWithScan($table, $scan, []);
+
+            if ($data = $this->__client->scannerGetList($id, $nbRows)) {
+                foreach ($data as $v) {
+                    foreach ($v->columns as $column => $value) {
+                        $list[$v->row][$column] = $value->value;
+                    }
+                }
+            }
+
+            return $list;
         }
 
         /**
@@ -95,13 +121,19 @@
         /**
          * 查询行记录
          * @param $table
+         * @param $startRow
+         * @param $nbRows
          * @return array
          */
-        public function getRows($table) {
+        public function getRows($table, $startRow = 1, $nbRows = 1000) {
             $list = [];
-            $k = 1;
-            while ($v = $this->getRow($table, $k, [])) {
-                $list[$k++] = $v;
+            $id = $this->__client->scannerOpen($table, $startRow, [], []);
+            if ($data = $this->__client->scannerGetList($id, $nbRows)) {
+                foreach ($data as $v) {
+                    foreach ($v->columns as $column => $value) {
+                        $list[$v->row][$column] = $value->value;
+                    }
+                }
             }
 
             return $list;
@@ -130,6 +162,15 @@
             }
 
             return !is_null($name) && isset($desc[$name]) ? $desc[$name] : $desc;
+        }
+
+        /**
+         * 创建表
+         * @param $tableName
+         * @param $columns
+         */
+        public function createTable($tableName, $columns) {
+            $this->__client->createTable($tableName, $columns);
         }
 
         public function __destruct() {
