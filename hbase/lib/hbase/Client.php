@@ -34,24 +34,27 @@
          * MultipleColumnPrefixFilter('sex', 'telephone') 记录(多个字段)
          * SingleColumnValueFilter('info', 'telephone', =, 'binary:17612800917') 记录(列族指定列查找)
          * PageFilter(5) 页记录数
-         * @param $table
-         * @param array $filter [filterString, startRow, stopRow]
-         * @param int $page
-         * @param int $pageSize
+         * @param array $data [string table, array filter, int page, int pageSize]
          * @return array
          */
-        public function search($table, $filter = [], $page = 1, $pageSize = 10) {
-            array_unshift($filter, "PageFilter({$pageSize})");
+        public function search($data) {
+            $data = array_merge([
+                'filter' => [],
+                'page' => 1,
+                'pageSize' => 10,
+            ], $data);
+            array_unshift($data['filter'], "PageFilter({$data['pageSize']})");
+
             $scan = new TScan([
-                'filterString' => implode(' ', $filter),
-                'startRow' => ($page - 1) * $pageSize + 1
+                'startRow' => ($data['page'] - 1) * $data['pageSize'] + 1,
+                'filterString' => implode(' ', $data['filter']),
             ]);
 
             $list = [];
-            $id = $this->__client->scannerOpenWithScan($table, $scan, []);
+            $id = $this->__client->scannerOpenWithScan($data['table'], $scan, []);
 
-            if ($data = $this->__client->scannerGetList($id, $pageSize)) {
-                foreach ($data as $v) {
+            if ($ref = $this->__client->scannerGetList($id, $data['pageSize'])) {
+                foreach ($ref as $v) {
                     foreach ($v->columns as $column => $value) {
                         $list[$v->row][$column] = $value->value;
                     }
