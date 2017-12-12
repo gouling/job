@@ -28,14 +28,14 @@
 
          * RowFilter(=,'binary:1') 记录(指定行键)
          * PrefixFilter('1') 记录(指定行键前缀)
-         * FamilyFilter(=,'binary:login') 记录(查找列族等于字符的字段)
-         * ValueFilter(=,'binary:芶凌') 记录(查找行值等于字符的字段)
-         * QualifierFilter(=,'binary:username') 记录(字段)
+         * FamilyFilter(=, 'binary:login') 记录(查找列族等于字符的字段)
+         * ValueFilter(=, 'binary:芶凌') 记录(查找行值等于字符的字段)
+         * QualifierFilter(=, 'binary:username') 记录(字段)
+         * ColumnPrefixFilter('telephone') 记录(字段前缀)
          * ColumnRangeFilter('address', true, 'telephone', true) 记录(指定字段范围), bool值是否包含等于
          * MultipleColumnPrefixFilter('sex', 'telephone') 记录(多个字段)
-         * ColumnPrefixFilter('telephone') AND ValueFilter(=,'binary:17612800917') 记录(字段前缀查找)
          * SingleColumnValueFilter('info', 'telephone', =, 'binary:17612800917') 记录(列族指定列查找)
-
+         *
          * @param $table
          * @param array $filter [filterString, startRow, stopRow]
          * @param int $nbRows
