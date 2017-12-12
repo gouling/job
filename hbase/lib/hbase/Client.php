@@ -20,10 +20,12 @@
 
         /**
          * AND OR = > < >= <= !=
+         *
          * binary 等于
-         * binaryprefix 前缀
-         * regexstring 正则
+         * binaryPrefix 前缀
+         * regexString 正则
          * substring 包含
+         *
          * RowFilter(=,'binary:1') 记录(指定行键)
          * PrefixFilter('1') 记录(指定行键前缀)
          * FamilyFilter(=, 'binary:login') 记录(查找列族等于字符的字段)
@@ -33,6 +35,7 @@
          * ColumnRangeFilter('address', true, 'telephone', true) 记录(指定字段范围), bool值是否包含等于
          * MultipleColumnPrefixFilter('sex', 'telephone') 记录(多个字段)
          * SingleColumnValueFilter('info', 'telephone', =, 'binary:17612800917') 记录(列族指定列查找)
+         *
          * PageFilter(5) 页记录数
          * @param array $data [string table, array filter, int page, int pageSize]
          * @return array
