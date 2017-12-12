@@ -22,8 +22,8 @@
          * AND OR = > < >= <= !=
          *
          * binary 等于
-         * binaryPrefix 前缀
-         * regexString 正则
+         * binaryprefix 前缀
+         * regexstring 正则
          * substring 包含
 
          * RowFilter(=,'binary:1') 记录(指定行键)
@@ -37,14 +37,12 @@
          * SingleColumnValueFilter('info', 'telephone', =, 'binary:17612800917') 记录(列族指定列查找)
 
          * @param $table
-         * @param array $filter
+         * @param array $filter [filterString, startRow, stopRow]
          * @param int $nbRows
          * @return array
          */
         public function search($table, $filter = [], $nbRows = 10) {
-            $scan = new TScan([
-                'filterString' => ""
-            ]);
+            $scan = new TScan($filter);
 
             $list = [];
             $id = $this->__client->scannerOpenWithScan($table, $scan, []);
