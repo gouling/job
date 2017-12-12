@@ -19,12 +19,17 @@
         }
 
         /**
-         * 条件支持 AND OR，比较支持 = >= <= !=
-         * PrefixFilter('1') 行K等于1的记录
+         * 条件支持 AND OR，比较支持 = > < >= <= !=
+         * RowFilter(=,'binary:1') 行K等于1的记录
+         * PrefixFilter('1') 行K等于1的记录，行K以1为前缀的记录
          * ValueFilter(=,'binary:芶凌') 值等于芶凌的行K、字段、值
+         * ValueFilter(=,'binaryprefix:芶凌') 值字符左匹配芶凌的行K、字段、值
+         * ValueFilter(=,'regexstring:芶*凌') 值字符左匹配芶右匹配凌的行K、字段、值
          * ValueFilter(=,'substring:芶凌') 值包含芶凌的行K、字段、值
+         * QualifierFilter(=,'binary:username') 列等于realname的行K、字段、值
          * ColumnPrefixFilter('realname') AND ValueFilter(=,'substring:芶凌') 字段realname包含芶凌的行K、字段、值
          * SingleColumnValueFilter('info', 'realname', =, 'substring:芶凌') 字段info:realname包含芶凌的记录
+         * ColumnRangeFilter('address', true, 'realname', true) 查询列大于等于address与小于等于realname的， bool值是否等于
          * @param $table
          * @param array $filter
          * @param int $nbRows
@@ -32,7 +37,7 @@
          */
         public function search($table, $filter = [], $nbRows = 10) {
             $scan = new TScan([
-                'filterString' => "PrefixFilter('1')"
+                'filterString' => "ColumnRangeFilter('address', true, 'realname', true) AND ColumnPrefixFilter('realname') AND ValueFilter(=,'substring:芶凌')"
             ]);
 
             $list = [];
