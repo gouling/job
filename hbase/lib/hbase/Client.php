@@ -20,12 +20,10 @@
 
         /**
          * AND OR = > < >= <= !=
-         *
          * binary 等于
          * binaryprefix 前缀
          * regexstring 正则
          * substring 包含
-
          * RowFilter(=,'binary:1') 记录(指定行键)
          * PrefixFilter('1') 记录(指定行键前缀)
          * FamilyFilter(=, 'binary:login') 记录(查找列族等于字符的字段)
@@ -35,19 +33,24 @@
          * ColumnRangeFilter('address', true, 'telephone', true) 记录(指定字段范围), bool值是否包含等于
          * MultipleColumnPrefixFilter('sex', 'telephone') 记录(多个字段)
          * SingleColumnValueFilter('info', 'telephone', =, 'binary:17612800917') 记录(列族指定列查找)
-         *
+         * PageFilter(5) 页记录数
          * @param $table
          * @param array $filter [filterString, startRow, stopRow]
-         * @param int $nbRows
+         * @param int $page
+         * @param int $pageSize
          * @return array
          */
-        public function search($table, $filter = [], $nbRows = 10) {
-            $scan = new TScan($filter);
+        public function search($table, $filter = [], $page = 1, $pageSize = 10) {
+            array_unshift($filter, "PageFilter({$pageSize})");
+            $scan = new TScan([
+                'filterString' => implode(' ', $filter),
+                'startRow' => ($page - 1) * $pageSize + 1
+            ]);
 
             $list = [];
             $id = $this->__client->scannerOpenWithScan($table, $scan, []);
 
-            if ($data = $this->__client->scannerGetList($id, $nbRows)) {
+            if ($data = $this->__client->scannerGetList($id, $pageSize)) {
                 foreach ($data as $v) {
                     foreach ($v->columns as $column => $value) {
                         $list[$v->row][$column] = $value->value;
