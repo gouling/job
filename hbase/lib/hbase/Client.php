@@ -19,17 +19,23 @@
         }
 
         /**
-         * 条件支持 AND OR，比较支持 = > < >= <= !=
-         * RowFilter(=,'binary:1') 行K等于1的记录
-         * PrefixFilter('1') 行K等于1的记录，行K以1为前缀的记录
-         * ValueFilter(=,'binary:芶凌') 值等于芶凌的行K、字段、值
-         * ValueFilter(=,'binaryprefix:芶凌') 值字符左匹配芶凌的行K、字段、值
-         * ValueFilter(=,'regexstring:芶*凌') 值字符左匹配芶右匹配凌的行K、字段、值
-         * ValueFilter(=,'substring:芶凌') 值包含芶凌的行K、字段、值
-         * QualifierFilter(=,'binary:username') 列等于realname的行K、字段、值
-         * ColumnPrefixFilter('realname') AND ValueFilter(=,'substring:芶凌') 字段realname包含芶凌的行K、字段、值
-         * SingleColumnValueFilter('info', 'realname', =, 'substring:芶凌') 字段info:realname包含芶凌的记录
-         * ColumnRangeFilter('address', true, 'realname', true) 查询字段名大于等于address与小于等于realname的， bool值是否等于
+         * AND OR = > < >= <= !=
+         *
+         * binary 等于
+         * binaryPrefix 前缀
+         * regexString 正则
+         * substring 包含
+
+         * RowFilter(=,'binary:1') 记录(指定行键)
+         * PrefixFilter('1') 记录(指定行键前缀)
+         * FamilyFilter(=,'binary:login') 记录(查找列族等于字符的字段)
+         * ValueFilter(=,'binary:芶凌') 记录(查找行值等于字符的字段)
+         * QualifierFilter(=,'binary:username') 记录(字段)
+         * ColumnRangeFilter('address', true, 'telephone', true) 记录(指定字段范围), bool值是否包含等于
+         * MultipleColumnPrefixFilter('sex', 'telephone') 记录(多个字段)
+         * ColumnPrefixFilter('telephone') AND ValueFilter(=,'binary:17612800917') 记录(字段前缀查找)
+         * SingleColumnValueFilter('info', 'telephone', =, 'binary:17612800917') 记录(列族指定列查找)
+
          * @param $table
          * @param array $filter
          * @param int $nbRows
@@ -37,7 +43,7 @@
          */
         public function search($table, $filter = [], $nbRows = 10) {
             $scan = new TScan([
-                'filterString' => "ColumnRangeFilter('address', true, 'realname', true) AND ColumnPrefixFilter('realname') AND ValueFilter(=,'substring:芶凌')"
+                'filterString' => ""
             ]);
 
             $list = [];
