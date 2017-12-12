@@ -1,4 +1,4 @@
-#!/usr/bin/env /usr/share/php-7.1.11/bin/php
+#!/usr/bin/env /usr/share/php-7.2.0/bin/php
 
 <?php
     $data = getopt('', [
