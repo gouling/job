@@ -72,7 +72,7 @@ daemon() {
 if [ -z $1 ]; then
 	echo 'Please enter the action for [stop|start|status|restart|daemon]'
 else
-    task=$(cd `dirname $0`; pwd)'/task'
+    task=`pwd`/$(dirname $0)'/task'
     config="${task}.config"
 
     OLD_IFS=$IFS
