@@ -4,6 +4,6 @@
     require __DIR__ . '/lib/index.php';
 
     $app = CApp::create(require __DIR__ . '/setting.php')->initialize();
-    $app->work('algorithm', 'set', [
-        'platformId' => 1
-    ]);
+    $app->work('algorithm', 'set', getopt('', [
+        'platformId:'
+    ]));

@@ -6,6 +6,12 @@
         private $__data, $__prefix;
 
         public function set($data) {
+            if(!isset($data['platformId'])) {
+                throw new \Exception('平台参数(platformId)不可用', 404);
+            } else if(!isset(\CApp::$Setting['algorithm']['data']['listen'][$data['platformId']])) {
+                throw new \Exception('平台参数(platformId)不支持', 501);
+            }
+
             $this->__data = $data;
             $this->__setPrefix();
 

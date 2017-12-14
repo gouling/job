@@ -1,0 +1,15 @@
+[Unit]
+Description=PHP Task Server
+After=network.target nss-lookup.target
+
+[Service]
+Type=forking
+GuessMainPID=yes
+ExecStart=/home/gouling/.WebIde90/trunk/match/Bin/task daemon
+ExecReload=/home/gouling/.WebIde90/trunk/match/Bin/task restart
+ExecStop=/home/gouling/.WebIde90/trunk/match/Bin/task stop
+RemainAfterExit=yes
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target

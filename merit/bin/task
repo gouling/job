@@ -1,0 +1,91 @@
+#!/bin/bash
+
+read() {
+    section=$1
+    item=$2
+
+    val=`awk -F '=' '/\['${section}'\]/{a=1}a==1&&$1~/'${item}'/{print $0;exit}' ${config}`
+    echo $val | sed "s/${item}\=//g"
+}
+
+status() {
+    for key in ${list[@]}
+    do
+        name=$(read $key name)
+        desc=$(read $key desc)
+        service=$(read $key service)
+        stat=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
+        if [ -z $stat ]; then
+            id='stopped'
+        else
+            case $stat in
+                'X') id='stopped';;
+                'Z') id='stopped';;
+                *) id='running，process id：'`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`;;
+            esac
+        fi
+
+        echo "${name}[${desc}]，service is ${id}。"
+    done
+}
+
+start() {
+    for key in ${list[@]}
+    do
+        name=$(read $key name)
+        service=$(read $key service)
+        log=$(read $key log)
+        stat=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
+        if [ -z $stat ]; then
+            cd $(read $key work)
+            su $(read setting user) -c "${service} >> ${log} &"
+        else
+            case $stat in
+                'X') stop;;
+                'Z') stop;;
+            esac
+        fi
+    done
+}
+
+stop() {
+    for key in ${list[@]}
+    do
+        service=$(read $key service)
+        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 9 >/dev/null 2>&1
+    done
+}
+
+restart() {
+	stop
+	start
+}
+
+daemon() {
+    while true
+    do
+        start
+        sleep 1
+    done &
+}
+
+if [ -z $1 ]; then
+	echo 'Please enter the action for [stop|start|status|restart|daemon]'
+else
+    task=`pwd`/$(dirname $0)'/task'
+    config="${task}.config"
+
+    OLD_IFS=$IFS
+    IFS=','
+    list=($(read setting listen))
+    IFS=$OLD_IFS
+
+    case $1 in
+        'status') status;;
+        'start') start;;
+        'stop') stop;;
+		'restart') restart;;
+        'daemon') daemon;;
+        *) echo 'Please enter the action for [stop|start|status|restart|daemon]';;
+    esac
+fi
