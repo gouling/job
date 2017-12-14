@@ -9,19 +9,22 @@ read() {
 }
 
 status() {
+    echo '名称[描述]状态，运行时间，进程号，处理器，内存'
     for key in ${list[@]}
     do
         name=$(read $key name)
         desc=$(read $key desc)
         service=$(read $key service)
-        stat=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
-        if [ -z $stat ]; then
+        pid=`ps -aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`
+
+        if [ -z $pid ]; then
             id='已停止'
         else
-            case $stat in
+            detail=($(ps -eo pid,stat,etime,pcpu,pmem | grep $pid))
+            case ${detail[1]} in
                 'X') id='已停止';;
                 'Z') id='已停止';;
-                *) id='运行中，进程：'`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`;;
+                *) id="运行中，${detail[2]}，${detail[0]}，${detail[3]}%，${detail[4]}%";;
             esac
         fi
 
@@ -35,12 +38,12 @@ start() {
         name=$(read $key name)
         service=$(read $key service)
         log=$(read $key log)
-        stat=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
-        if [ -z $stat ]; then
+        pid=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
+        if [ -z $pid ]; then
             cd $(read $key work)
             su $(read setting user) -c "${service} >> ${log} &"
         else
-            case $stat in
+            case $pid in
                 'X') stop;;
                 'Z') stop;;
             esac

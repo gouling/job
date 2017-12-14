@@ -55,6 +55,7 @@
                     }
                 }
 
+                $this->__addTestData();
                 sleep(1);
             }
         }
