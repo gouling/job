@@ -16,16 +16,16 @@ status() {
         service=$(read $key service)
         stat=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
         if [ -z $stat ]; then
-            id='stopped'
+            id='已停止'
         else
             case $stat in
-                'X') id='stopped';;
-                'Z') id='stopped';;
-                *) id='running，process id：'`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`;;
+                'X') id='已停止';;
+                'Z') id='已停止';;
+                *) id='运行中，进程：'`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`;;
             esac
         fi
 
-        echo "${name}[${desc}]，service is ${id}。"
+        echo "${name}[${desc}]${id}。"
     done
 }
 
@@ -52,7 +52,7 @@ stop() {
     for key in ${list[@]}
     do
         service=$(read $key service)
-        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 9 >/dev/null 2>&1
+        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 3 >/dev/null 2>&1
     done
 }
 

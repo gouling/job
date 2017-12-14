@@ -39,7 +39,7 @@
 
         public function work($component, $server, $data = []) {
             try {
-                $this->log->work(vsprintf("%s服务，已运行，Pid：%s", [
+                $this->log->work(vsprintf("%s，已运行，Pid：%s", [
                     self::$Setting[$component]['data']['name'],
                     self::$Pid,
                 ]));
@@ -47,12 +47,12 @@
                 $this->components[$component] = new self::$Setting[$component]['class']();
                 $this->components[$component]->$server($data);
 
-                $this->log->work(vsprintf("%s服务，已完成，Pid：%s", [
+                $this->log->work(vsprintf("%s，已完成，Pid：%s", [
                     self::$Setting[$component]['data']['name'],
                     self::$Pid,
                 ]));
             } catch (\Exception $e) {
-                $this->log->work(vsprintf("%s服务，已停止，Pid：%s，消息：%s", [
+                $this->log->work(vsprintf("%s，已停止，Pid：%s，消息：%s", [
                     self::$Setting[$component]['data']['name'],
                     self::$Pid,
                     $e->getMessage()

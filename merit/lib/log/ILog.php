@@ -11,7 +11,7 @@
                 mkdir(\CApp::$Setting['log']['file'], 0777, true);
             }
 
-            $this->work(vsprintf('日志已就绪，路经：%s', [
+            $this->work(vsprintf('日志：已就绪，路经：%s', [
                 \CApp::$Setting['log']['file']
             ]));
         }

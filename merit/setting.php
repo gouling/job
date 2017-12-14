@@ -1,6 +1,6 @@
 <?php
     return [
-        'stable' => false,
+        'stable' => true,
         'log' => [
             'file' => __DIR__ . '/log',
             'format' => 'Ymd',
@@ -17,7 +17,6 @@
             'class' => '\algorithm\CAlgorithm',
             'data' => [
                 'name' => '匹配',
-                'pause' => 10,
                 'size' => 1000,
                 'prefix' => [
                     'task' => 'INTERFACE:TASK',
