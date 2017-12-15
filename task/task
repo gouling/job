@@ -18,17 +18,17 @@ status() {
         pid=`ps -aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`
 
         if [ -z $pid ]; then
-            id='已停止'
+            id='已停止。'
         else
             detail=($(ps -eo pid,stat,etime,pcpu,pmem | grep $pid))
             case ${detail[1]} in
-                'X') id='已停止';;
-                'Z') id='已停止';;
+                'X') id='已停止。';;
+                'Z') id='已停止。';;
                 *) id="运行中，${detail[2]}，${detail[0]}，${detail[3]}%，${detail[4]}%";;
             esac
         fi
 
-        echo "${name}[${desc}]${id}。"
+        echo "${name}[${desc}]${id}"
     done
 }
 
