@@ -56,7 +56,7 @@
                 }
 
                 $this->__addTestData();
-                sleep(1);
+                usleep(100000);
             }
         }
 

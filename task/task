@@ -9,7 +9,6 @@ read() {
 }
 
 status() {
-    echo '名称[描述]状态，运行时间，进程号，处理器，内存'
     for key in ${list[@]}
     do
         name=$(read $key name)
@@ -18,17 +17,17 @@ status() {
         pid=`ps -aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $2}'`
 
         if [ -z $pid ]; then
-            id='已停止。'
+            id='Stopped'
         else
             detail=($(ps -eo pid,stat,etime,pcpu,pmem | grep $pid))
             case ${detail[1]} in
-                'X') id='已停止。';;
-                'Z') id='已停止。';;
-                *) id="运行中，${detail[2]}，${detail[0]}，${detail[3]}%，${detail[4]}%";;
+                'X') id='Stopped';;
+                'Z') id='Stopped';;
+                *) id="Running，${detail[0]}/${detail[2]}/${detail[3]}%/${detail[4]}%";;
             esac
         fi
 
-        echo "${name}[${desc}]${id}"
+        echo "${name}[${desc}] is ${id}。"
     done
 }
 

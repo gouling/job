@@ -20,7 +20,8 @@
                 'size' => 1000,
                 'prefix' => [
                     'task' => 'INTERFACE:TASK',
-                    'fail' => 'INTERFACE:FAIL'
+                    'fail' => 'INTERFACE:FAIL',
+                    'data' => 'INTERFACE:DATA',
                 ],
                 'listen' => [
                     1 => 'PP',
