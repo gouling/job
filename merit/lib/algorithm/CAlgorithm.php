@@ -49,15 +49,15 @@
                             }
                             break;
                         case 'borrow.set':
-                            \CApp::$App->log->work("官方债权匹配数据".PHP_EOL.print_r($task, true));
+                            \CApp::$App->log->work("官方债权匹配数据：{$field}".PHP_EOL.print_r($task, true));
                             \CApp::$App->cache->failTask($this->__prefix, $field);
                             break;
                         case 'user.get':
-                            \CApp::$App->log->work("用户提现转让数据".PHP_EOL.print_r($task, true));
+                            \CApp::$App->log->work("用户提现转让数据：{$field}".PHP_EOL.print_r($task, true));
                             \CApp::$App->cache->failTask($this->__prefix, $field);
                             break;
                         default:
-                            \CApp::$App->log->work("不支持的任务数据");
+                            \CApp::$App->log->work("不支持的任务数据：{$field}");
                             \CApp::$App->cache->failTask($this->__prefix, $field);
                     }
                 }
