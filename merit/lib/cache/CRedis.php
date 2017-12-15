@@ -13,7 +13,6 @@
         ];
 
         const PREFIX_DATA = ':DATA';
-        const PREFIX_INCR = ':INCR';
         const PREFIX_FAIL = ':FAIL';
 
         public function __construct() {
@@ -64,7 +63,7 @@
         }
 
         public function addTask($prefix, $data) {
-            return parent::hSet($prefix . self::PREFIX_DATA, $this->__getHashField($prefix), json_encode($data)) > 0;
+            return parent::hSet($prefix . self::PREFIX_DATA, $this->__getHashField(), json_encode($data)) > 0;
         }
 
         public function addSystemTask($prefix, $signal) {
@@ -91,7 +90,16 @@
             return false;
         }
 
-        private function __getHashField($prefix) {
-            return parent::incr($prefix . self::PREFIX_INCR);
+        private function __getHashField($length = 16) {
+            if (function_exists('random_bytes')) {
+                $bytes = random_bytes(ceil($length / 2));
+            } else if (function_exists('openssl_random_pseudo_bytes')) {
+                $bytes = openssl_random_pseudo_bytes(ceil($length / 2));
+            } else {
+                $bytes = str_shuffle(uniqid('', true));
+            }
+            $bytes = substr(bin2hex($bytes), 0, $length);
+
+            return substr(chunk_split($bytes, 4, '-'), 0, -1);
         }
     }
