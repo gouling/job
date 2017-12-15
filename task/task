@@ -71,8 +71,24 @@ daemon() {
     done &
 }
 
+reload() {
+    for key in ${list[@]}
+    do
+        service=$(read $key service)
+        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 12 >/dev/null 2>&1
+    done
+}
+
+recovery() {
+    for key in ${list[@]}
+    do
+        service=$(read $key service)
+        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 10 >/dev/null 2>&1
+    done
+}
+
 if [ -z $1 ]; then
-	echo 'Please enter the action for [stop|start|status|restart|daemon]'
+	echo 'Please enter then service for [stop|start|status|reload|recovery|restart|daemon]'
 else
     task=`pwd`/$(dirname $0)'/task'
     config="${task}.config"
@@ -83,11 +99,13 @@ else
     IFS=$OLD_IFS
 
     case $1 in
+        'reload') reload;;
+        'recovery') recovery;;
         'status') status;;
         'start') start;;
         'stop') stop;;
 		'restart') restart;;
         'daemon') daemon;;
-        *) echo 'Please enter the action for [stop|start|status|restart|daemon]';;
+        *) echo 'Please enter then service for [stop|start|status|reload|recovery|restart|daemon]';;
     esac
 fi

@@ -55,7 +55,6 @@
                     }
                 }
 
-                $this->__addTestData();
                 usleep(100000);
             }
         }
