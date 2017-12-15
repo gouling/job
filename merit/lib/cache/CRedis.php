@@ -63,7 +63,18 @@
         }
 
         public function addTask($prefix, $data) {
-            return parent::hSet($prefix . self::PREFIX_DATA, $this->__getHashField(), json_encode($data)) > 0;
+            $dataKey = $prefix . self::PREFIX_DATA;
+            $field = $this->__getHashField();
+
+            while(true) {
+                if(parent::hExists($dataKey, $field)) {
+                    $field = $this->__getHashField();
+                } else {
+                    break;
+                }
+            }
+
+            return parent::hSet($prefix . self::PREFIX_DATA, $field, json_encode($data)) > 0;
         }
 
         public function addSystemTask($prefix, $signal) {
