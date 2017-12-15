@@ -8,6 +8,7 @@
         public function set($data) {
             $this->__chkArgs($data);
             $this->__setPrefix();
+            $this->__addData();
 
             $this->__signal();
             $this->__listen();
@@ -27,15 +28,18 @@
             while (true) {
                 pcntl_signal_dispatch();
 
-                if ($task = \CApp::$App->cache->getTask($this->__prefix)) {
+                $tasks = \CApp::$App->cache->getTask($this->__prefix);
+                foreach ($tasks as $field => $task) {
                     switch ($task['action']) {
                         case 'system':
+                            \CApp::$App->cache->finishTask($this->__prefix, $field);
                             if(isset(\cache\CRedis::SYSTEM_TASK[$task['data']])) {
                                 \CApp::$App->log->work('指令：'.\cache\CRedis::SYSTEM_TASK[$task['data']]);
                                 switch ($task['data']) {
                                     case \cache\CRedis::SYSTEM_STOP:
-                                        break 3;
+                                        break 4;
                                     case \cache\CRedis::SYSTEM_RECOVERY:
+                                        \CApp::$App->cache->recoveryTask($this->__prefix);
                                         break;
                                     case \cache\CRedis::SYSTEM_RELOAD:
                                         break;
@@ -46,12 +50,15 @@
                             break;
                         case 'borrow.set':
                             \CApp::$App->log->work("官方债权匹配数据".PHP_EOL.print_r($task, true));
+                            \CApp::$App->cache->failTask($this->__prefix, $field);
                             break;
                         case 'user.get':
                             \CApp::$App->log->work("用户提现转让数据".PHP_EOL.print_r($task, true));
+                            \CApp::$App->cache->failTask($this->__prefix, $field);
                             break;
                         default:
                             \CApp::$App->log->work("不支持的任务数据");
+                            \CApp::$App->cache->failTask($this->__prefix, $field);
                     }
                 }
 
@@ -101,13 +108,12 @@
         }
 
         private function __setPrefix() {
-            $this->__prefix = \CApp::$Setting['algorithm']['data']['prefix']['task'] . ':' .
-                \CApp::$Setting['algorithm']['data']['listen'][$this->__data['platformId']];
+            $this->__prefix = \CApp::$Setting['algorithm']['data']['listen'][$this->__data['platformId']];
 
             \CApp::$App->log->work("平台：{$this->__data['platformId']}，监听：{$this->__prefix}");
         }
 
-        private function __addTestData() {
+        private function __addData() {
             \CApp::$App->cache->addTask($this->__prefix, [
                 'action' => 'borrow.set',
                 'source' => [

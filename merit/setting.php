@@ -17,12 +17,6 @@
             'class' => '\algorithm\CAlgorithm',
             'data' => [
                 'name' => '匹配',
-                'size' => 1000,
-                'prefix' => [
-                    'task' => 'INTERFACE:TASK',
-                    'fail' => 'INTERFACE:FAIL',
-                    'data' => 'INTERFACE:DATA',
-                ],
                 'listen' => [
                     1 => 'PP',
                     2 => 'WLC',

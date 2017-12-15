@@ -3,18 +3,18 @@
     namespace cache;
 
     class CRedis extends \Redis {
-        const POSITION_HEAD = 'HEAD';
-        const POSITION_TAIL = 'TAIL';
-
         const SYSTEM_STOP = 3;
         const SYSTEM_RECOVERY = 10;
         const SYSTEM_RELOAD = 12;
-
         const SYSTEM_TASK = [
             self::SYSTEM_STOP => '停止服务',
             self::SYSTEM_RECOVERY => '恢复异常',
             self::SYSTEM_RELOAD => '重载配置',
         ];
+
+        const PREFIX_DATA = ':DATA';
+        const PREFIX_INCR = ':INCR';
+        const PREFIX_FAIL = ':FAIL';
 
         public function __construct() {
             parent::__construct();
@@ -34,28 +34,64 @@
             }
         }
 
-        public function addTask($prefix, $data, $position = self::POSITION_TAIL) {
-            switch ($position) {
-                case self::POSITION_HEAD:
-                    return parent::lPush($prefix, json_encode($data)) > 0;
-                case self::POSITION_TAIL:
-                    return parent::rPush($prefix, json_encode($data)) > 0;
+        public function getTask($prefix) {
+            if ($data = parent::hGetAll($prefix . self::PREFIX_DATA)) {
+                foreach ($data as $k => $v) {
+                    $data[$k] = json_decode($v, true);
+                }
             }
+
+            return $data;
         }
 
-        public function getTask($prefix, $position = self::POSITION_HEAD) {
-            switch ($position) {
-                case self::POSITION_HEAD:
-                    return json_decode(parent::lPop($prefix), true);
-                case self::POSITION_TAIL:
-                    return json_decode(parent::rPop($prefix), true);
+        public function finishTask($prefix, $field) {
+            return parent::hDel($prefix . self::PREFIX_DATA, $field) > 0;
+        }
+
+        public function failTask($prefix, $field) {
+            $dataKey = $prefix . self::PREFIX_DATA;
+            $failKey = $prefix . self::PREFIX_FAIL;
+
+            if ($data = parent::hGet($dataKey, $field)) {
+                parent::multi();
+                parent::hDel($dataKey, $field);
+                parent::hSet($failKey, $field, $data);
+                parent::exec();
+                return true;
             }
+
+            return false;
+        }
+
+        public function addTask($prefix, $data) {
+            return parent::hSet($prefix . self::PREFIX_DATA, $this->__getHashField($prefix), json_encode($data)) > 0;
         }
 
         public function addSystemTask($prefix, $signal) {
             $this->addTask($prefix, [
                 'action' => 'system',
                 'data' => $signal
-            ], self::POSITION_HEAD);
+            ]);
+        }
+
+        public function recoveryTask($prefix) {
+            $dataKey = $prefix . self::PREFIX_DATA;
+            $failKey = $prefix . self::PREFIX_FAIL;
+
+            if ($data = parent::hGetAll($failKey)) {
+                parent::multi();
+                foreach ($data as $k => $v) {
+                    parent::hDel($failKey, $k);
+                    parent::hSet($dataKey, $k, $v);
+                }
+                parent::exec();
+                return true;
+            }
+
+            return false;
+        }
+
+        private function __getHashField($prefix) {
+            return parent::incr($prefix . self::PREFIX_INCR);
         }
     }
