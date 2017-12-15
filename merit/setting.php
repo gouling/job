@@ -10,7 +10,8 @@
             'host' => '127.0.0.1',
             'port' => 6379,
             'db' => 0,
-            'timeout' => 5
+            'timeout' => 5,
+            'key' => 'task:'
         ],
 
         'algorithm' => [
@@ -18,9 +19,9 @@
             'data' => [
                 'name' => '匹配',
                 'listen' => [
-                    1 => 'PP',
-                    2 => 'WLC',
-                    3 => 'BB',
+                    1 => 'pp',
+                    2 => 'wlc',
+                    3 => 'bb',
                 ]
             ],
         ],

@@ -12,8 +12,8 @@
             self::SYSTEM_RELOAD => '重载配置',
         ];
 
-        const PREFIX_DATA = ':DATA';
-        const PREFIX_FAIL = ':FAIL';
+        const PREFIX_DATA = ':data';
+        const PREFIX_FAIL = ':fail';
 
         public function __construct() {
             parent::__construct();
@@ -21,6 +21,7 @@
             if (parent::connect(\CApp::$Setting['cache']['host'], \CApp::$Setting['cache']['port'],
                 \CApp::$Setting['cache']['timeout'])) {
                 parent::select(\CApp::$Setting['cache']['db']);
+
                 \CApp::$App->log->work(vsprintf('缓存：已就续，服务器：%s，端口：%s', [
                     \CApp::$Setting['cache']['host'],
                     \CApp::$Setting['cache']['port']
@@ -34,7 +35,7 @@
         }
 
         public function getTask($prefix) {
-            if ($data = parent::hGetAll($prefix . self::PREFIX_DATA)) {
+            if ($data = parent::hGetAll(\CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_DATA)) {
                 foreach ($data as $k => $v) {
                     $data[$k] = json_decode($v, true);
                 }
@@ -44,12 +45,12 @@
         }
 
         public function finishTask($prefix, $field) {
-            return parent::hDel($prefix . self::PREFIX_DATA, $field) > 0;
+            return parent::hDel(\CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_DATA, $field) > 0;
         }
 
         public function failTask($prefix, $field) {
-            $dataKey = $prefix . self::PREFIX_DATA;
-            $failKey = $prefix . self::PREFIX_FAIL;
+            $dataKey = \CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_DATA;
+            $failKey = \CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_FAIL;
 
             if ($data = parent::hGet($dataKey, $field)) {
                 parent::multi();
@@ -63,11 +64,11 @@
         }
 
         public function addTask($prefix, $data) {
-            $dataKey = $prefix . self::PREFIX_DATA;
+            $dataKey = \CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_DATA;
             $field = $this->__getHashField();
 
-            while(true) {
-                if(parent::hExists($dataKey, $field)) {
+            while (true) {
+                if (parent::hExists($dataKey, $field)) {
                     $field = $this->__getHashField();
                 } else {
                     break;
@@ -85,8 +86,8 @@
         }
 
         public function recoveryTask($prefix) {
-            $dataKey = $prefix . self::PREFIX_DATA;
-            $failKey = $prefix . self::PREFIX_FAIL;
+            $dataKey = \CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_DATA;
+            $failKey = \CApp::$Setting['cache']['key'] . $prefix . self::PREFIX_FAIL;
 
             if ($data = parent::hGetAll($failKey)) {
                 parent::multi();
