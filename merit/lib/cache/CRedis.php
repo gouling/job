@@ -74,7 +74,7 @@
                 }
             }
 
-            return parent::hSet($prefix . self::PREFIX_DATA, $field, json_encode($data)) > 0;
+            return parent::hSet($dataKey, $field, json_encode($data)) > 0;
         }
 
         public function addSystemTask($prefix, $signal) {
