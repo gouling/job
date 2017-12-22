@@ -1,6 +1,6 @@
 <?php
     return [
-        'stable' => true,
+        'stable' => false,
         'log' => [
             'file' => __DIR__ . '/log',
             'format' => 'Ymd',
