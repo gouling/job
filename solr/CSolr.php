@@ -5,10 +5,7 @@
 
         public function query($query) {
             $data = array();
-            $query = str_ireplace(array(
-                '\'',
-                '\"'
-            ), '', $query);
+            $query = str_ireplace(array('\'', '\"'), '', $query);
 
             foreach ($this->__query as $k => $pattern) {
                 if (preg_match($pattern, $query, $data) == 1) {

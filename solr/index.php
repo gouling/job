@@ -11,6 +11,6 @@
     $config = $zookeeper->get('solr');
 
     $solr = new CSolr($config['host'], $config['timeout']);
-    $query = $solr->query('SELECT * FROM tender');
+    $query = $solr->query('SELECT * FROM tender WHERE borrow_name LIKE \'%女士%\'');
 
     print_r($query);
