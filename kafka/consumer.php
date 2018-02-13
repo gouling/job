@@ -11,6 +11,7 @@
      * RD_KAFKA_OFFSET_STORED
      */
     $topic->consumeQueueStart(0, RD_KAFKA_OFFSET_END, $queue);
+    $topic->consumeQueueStart(1, RD_KAFKA_OFFSET_END, $queue);
 
     while (true) {
         $data = $queue->consume(1000);  //timeout
@@ -18,5 +19,5 @@
             print_r("{$data->timestamp}:{$data->payload}".PHP_EOL);
         }
 
-        usleep(1000);
+        usleep(100000);
     }
