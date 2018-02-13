@@ -1,2 +1,2 @@
 # job
-php excel pay nulti soap hbase solr
+php excel nulti hbase solr kafka
