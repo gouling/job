@@ -13,7 +13,7 @@
                     $host = $this->__parseQuery(array_combine($fields, $data));
                     return array_merge(
                         array(
-                            'recordHost' => $host,
+                            //'recordHost' => $host,
                             'recordQuery' => $query,
                         ),
                         $this->__requestData($host)
