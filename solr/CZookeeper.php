@@ -2,33 +2,47 @@
     class CZookeeper {
         private $__zookeeper;
 
-        public function get($name) {
+        public function get($node) {
             $data = array();
 
-            if ($this->__zookeeper->exists("/{$name}")) {
-                $data['doc'] = $this->__zookeeper->get("/{$name}");
-                $child = $this->__zookeeper->getchildren("/{$name}");
-                foreach ($child as $node) {
-                    $data[$node] = $this->__zookeeper->get("/{$name}/{$node}");
+            if ($this->__zookeeper->exists($node)) {
+                $data['doc'] = $this->__zookeeper->get($node);
+                $child = $this->__zookeeper->getchildren($node);
+                foreach ($child as $child_node) {
+                    $data[$child_node] = $this->__zookeeper->get("{$node}/{$child_node}");
                 }
             }
 
             return $data;
         }
-
-        public function create($configList) {
-            foreach ($configList  as $k => $v) {
-                if($this->__zookeeper->exists($k)) {
-                    $this->__zookeeper->set($k, $v);
-                } else {
-                    $this->__zookeeper->create($k, $v, array(
-                        array(
-                            'perms' => Zookeeper::PERM_ALL,
-                            'scheme' => 'world',
-                            'id' => 'anyone',
-                        )
-                    ));
+        
+        public function set($node, $data) {
+            if($this->__zookeeper->exists($node)) {
+                $this->__zookeeper->set($node, $data);
+            } else {
+                $this->__zookeeper->create($node, $data, array(
+                    array(
+                        'perms' => Zookeeper::PERM_ALL,
+                        'scheme' => 'world',
+                        'id' => 'anyone',
+                    )
+                ));
+            }
+        }
+        
+        public function delete($node) {
+            if ($this->__zookeeper->exists($node)) {
+                $child = $this->__zookeeper->getchildren($node);
+                foreach ($child as $child_node) {
+                    $this->__zookeeper->delete("{$node}/{$child_node}");
                 }
+                $this->__zookeeper->delete($node);
+            }
+        }
+        
+        public function create($configList) {
+            foreach ($configList  as $node => $v) {
+                $this->set($node, $v);
             }
         }
 
