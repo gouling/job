@@ -18,11 +18,11 @@
 	$session = new CSession($zookeeper);
 	$id = session_id();
 
-	/*$_SESSION['id']  = 1;
+	$_SESSION['id']  = 1;
 	$_SESSION['user'] = array(
 		'name'=>'gouling',
 		'tel'=>'17612800917',
-	);*/
+	);
 	
 	$time = $session->getLastUpdateTime($id);
 	$datetime = date('Y-m-d H:i:s', $time) ;
