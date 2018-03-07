@@ -1,8 +1,11 @@
 <?php
     class CSession {
-        private $__lifetime = 300;
+        private $__lifetime ,  $__time;
         private $__node, $__zookeeper;
         public function __construct($zookeeper) {
+            $this->__lifetime = 300;
+            $this->__time = time();
+        
             $this->__node = '/session';
             $this->__zookeeper = $zookeeper;
             
@@ -18,7 +21,13 @@
         }
         
         public function getLastUpdateTime($id) {
-            return $this->__zookeeper->getNodeInfo("{$this->__node}/{$id}");
+            if($data = $this->__zookeeper->getNodeInfo("{$this->__node}/{$id}")) {
+                if(isset($data[0]['mtime'])) {
+                    return $data[0]['mtime']/1000;
+                }
+            }
+            
+            return 0;
         }
         
         public function open() {
@@ -44,8 +53,11 @@
         
         public function gc() {
             if($session = $this->__zookeeper->get($this->__node)) {
-                foreach($session as $id=$v) {
-                    $this->destory($id);
+                foreach($session as $id=>$v) {
+                    $time = $this->getLastUpdateTime($id);
+                    if($time + $this->__lifetime < $this->__time) {
+                        $this->destory($id);
+                    }
                 }
             }
         }

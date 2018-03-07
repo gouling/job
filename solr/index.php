@@ -24,7 +24,7 @@
 		'tel'=>'17612800917',
 	);
 	
-	$info = $session->getLastUpdateTime($id);
-	$datetime = isset($info[0]) ? date('Y-m-d H:i:s', $info[0]['mtime']/1000) : 0;
+	$time = $session->getLastUpdateTime($id);
+	$datetime = date('Y-m-d H:i:s', $time) ;
 	var_dump("session_id: {$id}, lastUpdateTime: {$datetime}");
 	var_dump($_SESSION);
