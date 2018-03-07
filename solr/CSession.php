@@ -2,7 +2,7 @@
     class CSession {
         private $__lifetime ,  $__time;
         private $__node, $__zookeeper;
-        public function __construct(&$zookeeper) {
+        public function __construct($zookeeper) {
             $this->__lifetime = 5;
             $this->__time = time();
         

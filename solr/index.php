@@ -17,8 +17,6 @@
 
 	$session = new CSession($zookeeper);
 	$id = session_id();
-	
-	sleep(10);
 
 	$_SESSION['id']  = 1;
 	$_SESSION['user'] = array(
