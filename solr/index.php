@@ -28,4 +28,3 @@
 	$datetime = date('Y-m-d H:i:s', $time) ;
 	var_dump("session_id: {$id}, lastUpdateTime: {$datetime}");
 	var_dump($_SESSION);
-	$session->destroy($id);

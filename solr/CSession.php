@@ -2,7 +2,7 @@
     class CSession {
         private $__lifetime ,  $__time;
         private $__node, $__zookeeper;
-        public function __construct($zookeeper) {
+        public function __construct(&$zookeeper) {
             $this->__lifetime = 5;
             $this->__time = time();
         
@@ -39,12 +39,16 @@
 
         public function read($id) {
            if($data = $this->__zookeeper->get("{$this->__node}/{$id}")) {
-                return $data['doc'];
+                return isset($data['doc']) ? $data['doc'] : $data;
            }
         }
         
         public function write($id, $data) {
-            return $this->__zookeeper->set( "{$this->__node}/{$id}", $data);
+            if(isset($data{0})) {
+                return $this->__zookeeper->set( "{$this->__node}/{$id}", $data);
+            }
+            
+            return false;
         }
         
         public function destroy($id) {
