@@ -16,15 +16,6 @@
 	$query = $solr->query('SELECT * FROM tender WHERE borrow_name LIKE \'%女士%\'');
 
 	$session = new CSession($zookeeper);
-	session_set_save_handler(
-		array($session, 'open'),
-		array($session, 'close'),
-		array($session, 'read'),
-		array($session, 'write'),
-		array($session, 'destroy'),
-		array($session, 'gc')
-	);
-	session_start();
 	$id = session_id();
 
 	$_SESSION['id']  = 1;

@@ -4,6 +4,16 @@
         public function __construct($zookeeper) {
             $this->__node = '/session';
             $this->__zookeeper = $zookeeper;
+            
+    session_set_save_handler(
+                array(&$this, 'open'),
+                array(&$this, 'close'),
+                array(&$this, 'read'),
+                array(&$this, 'write'),
+                array(&$this, 'destroy'),
+                array(&$this, 'gc')
+            );
+    session_start();
         }
         
         public function getLastUpdateTime($id) {
