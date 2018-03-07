@@ -3,7 +3,7 @@
         private $__lifetime ,  $__time;
         private $__node, $__zookeeper;
         public function __construct($zookeeper) {
-            $this->__lifetime = 300;
+            $this->__lifetime = 5;
             $this->__time = time();
         
             $this->__node = '/session';
@@ -53,10 +53,13 @@
         
         public function gc() {
             if($session = $this->__zookeeper->get($this->__node)) {
+                if(isset($session['doc'])) {
+                    unset($session['doc']);
+                }
                 foreach($session as $id=>$v) {
                     $time = $this->getLastUpdateTime($id);
                     if($time + $this->__lifetime < $this->__time) {
-                        $this->destory($id);
+                        $this->__zookeeper->delete("{$this->__node}/{$id}");
                     }
                 }
             }

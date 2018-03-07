@@ -44,6 +44,7 @@
                 foreach ($child as $child_node) {
                     $this->__zookeeper->delete("{$node}/{$child_node}");
                 }
+
                 $this->__zookeeper->delete($node);
             }
         }
