@@ -1,5 +1,6 @@
 <?php
     class CSession {
+        private $__lifetime = 300;
         private $__node, $__zookeeper;
         public function __construct($zookeeper) {
             $this->__node = '/session';
@@ -42,5 +43,10 @@
         }
         
         public function gc() {
+            if($session = $this->__zookeeper->get($this->__node)) {
+                foreach($session as $id=$v) {
+                    $this->destory($id);
+                }
+            }
         }
     }
