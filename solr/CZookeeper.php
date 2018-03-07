@@ -5,7 +5,7 @@
         public function get($node) {
             $data = array();
 
-            if ($this->__zookeeper->exists($node)) {
+            if ($this->exists($node)) {
                 $data['doc'] = $this->__zookeeper->get($node);
                 $child = $this->__zookeeper->getchildren($node);
                 foreach ($child as $child_node) {
@@ -16,8 +16,16 @@
             return $data;
         }
         
+        public function getNodeInfo($node) {
+            if($this->exists($node)) {
+                return $this->__zookeeper->getAcl($node);
+            }
+            
+            return array();
+        }
+        
         public function set($node, $data) {
-            if($this->__zookeeper->exists($node)) {
+            if($this->exists($node)) {
                 $this->__zookeeper->set($node, $data);
             } else {
                 $this->__zookeeper->create($node, $data, array(
@@ -31,7 +39,7 @@
         }
         
         public function delete($node) {
-            if ($this->__zookeeper->exists($node)) {
+            if ($this->exists($node)) {
                 $child = $this->__zookeeper->getchildren($node);
                 foreach ($child as $child_node) {
                     $this->__zookeeper->delete("{$node}/{$child_node}");
@@ -44,6 +52,10 @@
             foreach ($configList  as $node => $v) {
                 $this->set($node, $v);
             }
+        }
+        
+        public function exists($node) {
+            return $this->__zookeeper->exists($node);
         }
 
         public function __construct($zkConnInfo) {
