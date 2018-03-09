@@ -9,7 +9,9 @@
             $this->__node = '/session';
             $this->__zookeeper = $zookeeper;
             
-    session_set_save_handler(
+            ini_set('session.auto_start', 0);
+            ini_set('session.save_handler', 'user');
+            session_set_save_handler(
                 array(&$this, 'open'),
                 array(&$this, 'close'),
                 array(&$this, 'read'),
@@ -17,7 +19,7 @@
                 array(&$this, 'destroy'),
                 array(&$this, 'gc')
             );
-    session_start();
+            session_start();
         }
         
         public function getLastUpdateTime($id) {
