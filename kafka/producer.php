@@ -9,7 +9,8 @@
 
     $topic = $kafka->newTopic('tender');
     /**
-     * 分区参数
-     * RD_KAFKA_PARTITION_UA
+     * 分区标识
+     * 消息标识 当前始终为0
+     * 消息内容
      */
-    $topic->produce(RD_KAFKA_PARTITION_UA, 0, $data['id']);
+    $topic->produce(0, 0, $data['id']);
