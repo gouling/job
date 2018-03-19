@@ -10,13 +10,14 @@
      * RD_KAFKA_OFFSET_END
      * RD_KAFKA_OFFSET_STORED
      */
-    $topic->consumeQueueStart(0, RD_KAFKA_OFFSET_END, $queue);
-    $topic->consumeQueueStart(1, RD_KAFKA_OFFSET_END, $queue);
-
+    for($i=0; $i<10; $i++) {
+        $topic->consumeQueueStart($i, RD_KAFKA_OFFSET_END, $queue);
+    }
+    
     while (true) {
-        $data = $queue->consume(1000);  //timeout
+        $data = $queue->consume(0, 1000);  //timeout
         if (is_object($data) && $data->err == 0) {
-            print_r("{$data->timestamp}:{$data->payload}".PHP_EOL);
+            print_r("{$data->partition}->{$data->timestamp}:{$data->payload}".PHP_EOL);
         }
 
         usleep(100000);
