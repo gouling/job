@@ -1,7 +1,14 @@
 <?php
-    $data = getopt('', array(
-        'data:'
-    ));
+    $data = array_merge(
+        array(
+            'partition' => RD_KAFKA_PARTITION_UA,
+            'data' => 'this is default message'
+        ),
+        getopt('', array(
+            'partition:',
+            'data:'
+        ))
+    );
 
     $kafka = new \RdKafka\Producer();
     $kafka->setLogLevel(LOG_DEBUG);
@@ -13,4 +20,4 @@
      * 消息标识 当前始终为0
      * 消息内容
      */
-    $topic->produce(0, 0, $data['data']);
+    $topic->produce($data['partition'], 0, $data['data']);
