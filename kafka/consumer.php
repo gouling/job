@@ -1,7 +1,7 @@
 <?php
     $kafka = new \RdKafka\Consumer();
     $kafka->setLogLevel(LOG_DEBUG);
-    $kafka->addBrokers('192.168.252.58:9092');
+    $kafka->addBrokers('192.168.252.58:9092,192.168.252.58:9092');
 
     $queue = $kafka->newQueue();
     $topic = $kafka->newTopic('tender');
@@ -11,6 +11,7 @@
      * 消息队列
      */
     $topic->consumeQueueStart(0, 0, $queue);
+    $topic->consumeQueueStart(1, 0, $queue);
     
     while (true) {
         $data = $queue->consume(1000);  //timeout
