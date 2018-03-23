@@ -1,6 +1,6 @@
 <?php
     $data = getopt('', array(
-        'id:'
+        'data:'
     ));
 
     $kafka = new \RdKafka\Producer();
@@ -13,4 +13,4 @@
      * 消息标识 当前始终为0
      * 消息内容
      */
-    $topic->produce(0, 0, $data['id']);
+    $topic->produce(0, 0, $data['data']);
