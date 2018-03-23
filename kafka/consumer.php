@@ -1,7 +1,7 @@
 <?php
     $kafka = new \RdKafka\Consumer();
     $kafka->setLogLevel(LOG_DEBUG);
-    $kafka->addBrokers('192.168.252.58:9092,192.168.252.58:9092');
+    $kafka->addBrokers('192.168.252.58:9092,192.168.252.58:9093');
 
     $queue = $kafka->newQueue();
     $topic = $kafka->newTopic('tender');
