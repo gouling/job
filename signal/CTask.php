@@ -1,11 +1,14 @@
 <?php  
     class CTask {
-        private $__pid, $__sig, $__log;
+        private $__pid, $__sig, $__log, $__cache;
         
         public function __construct() {
             $this->__pid = function_exists('posix_getpid') ? posix_getpid() : 'windows';
             $this->__sig = new CSignal();
             $this->__log = new CLog();
+            $this->__cache = new CCache(array(
+                'option' => 'INTERFACE:OPTION'
+            ));
             $this->__log->info("{$this->__pid}，已运行。");
             
             $this->__listen();

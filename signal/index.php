@@ -3,5 +3,6 @@
     include 'CTask.php';
     include 'CSignal.php';
     include 'CLog.php';
+    include 'CCache.php';
     
     new CTask();
