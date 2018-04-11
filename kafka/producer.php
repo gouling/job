@@ -12,7 +12,7 @@
 
     $kafka = new \RdKafka\Producer();
     $kafka->setLogLevel(LOG_DEBUG);
-    $kafka->addBrokers('192.168.252.58:9092,192.168.252.58:9093');
+    $kafka->addBrokers('192.168.253.170:9092');
 
     $topic = $kafka->newTopic('tender');
     /**
