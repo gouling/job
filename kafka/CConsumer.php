@@ -14,11 +14,11 @@
             $this->__kafkaConfig = $kafkaConfig;
             $this->__topicConfig = $topicConfig;
             
-            $this->__initialize();
+            $this->__initialize($topicConfig);
             $this->__log->info("{$this->__pid}，initialized。");
         }
         
-        private function __initialize() {
+        private function __initialize($topicConfig) {
             $this->__kafka =  new \RdKafka\Consumer();
             $this->__kafka->setLogLevel(LOG_DEBUG);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
