@@ -13,7 +13,12 @@
             $this->__zookeeper = $zookeeper;
             $this->__kafkaConfig = $kafkaConfig;
             $this->__topicConfig = $topicConfig;
-
+            
+            $this->__initialize();
+            $this->__log->info("{$this->__pid}，initialized。");
+        }
+        
+        private function __initialize() {
             $this->__kafka =  new \RdKafka\Consumer();
             $this->__kafka->setLogLevel(LOG_DEBUG);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
@@ -32,8 +37,6 @@
                  */
                 $this->__topic->consumeQueueStart($partition, $offset, $this->__queue);
             }
-            
-            $this->__log->info("{$this->__pid}，initialized。");
         }
         
         public function consumer($operation) {
