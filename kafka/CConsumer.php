@@ -56,7 +56,7 @@
                             $refer = $e->message;
                         }
                         
-                        $this->__log->info("P{$data->partition}O{$data->offset}，{$data->payload}，{$refer}。");
+                        $this->__log->info("P{$data->partition}V{$data->offset}，{$data->payload}，{$refer}。");
                     }
                     $this->__zookeeper->set($this->__partition[$data->partition], $data->offset);
                 }
