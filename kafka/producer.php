@@ -1,16 +1,10 @@
 <?php
-    $data = array_merge(
-        array(
-            'partition' => RD_KAFKA_PARTITION_UA,
-            'data' => 'this is default message'
-        ),
-        getopt('', array(
-            'partition:',
-            'data:'
-        ))
+    $data = array(
+        'partition' => RD_KAFKA_PARTITION_UA,
+        'data' => 'this is default message'
     );
 
-    $kafka = new \RdKafka\Producer($conf);
+    $kafka = new \RdKafka\Producer();
     $kafka->setLogLevel(LOG_DEBUG);
     $kafka->addBrokers('192.168.253.170:9092');
 
