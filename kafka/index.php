@@ -19,7 +19,7 @@
     );
     
     $zookeeper = new CZookeeper('192.168.253.170:2181');
-    $zookeeper->create($application);
+    //$zookeeper->create($application);
     
     $kafkaConfig = $zookeeper->get('/application/kafka');
     $topicConfig = $zookeeper->get('/application/kafka/tender');
@@ -28,7 +28,7 @@
     
     class Demo {
         public function set($data) {
-            //print_r($data);
+            print_r($data);
             return true;
         }
     }

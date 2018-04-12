@@ -14,11 +14,10 @@
             $this->__kafkaConfig = $kafkaConfig;
             $this->__topicConfig = $topicConfig;
             
-            $this->__initialize($topicConfig);
-            $this->__log->info("{$this->__pid}，initialized。");
+            $this->__initialize();
         }
         
-        private function __initialize($topicConfig) {
+        private function __initialize() {
             $this->__kafka =  new \RdKafka\Consumer();
             $this->__kafka->setLogLevel(LOG_DEBUG);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
@@ -27,7 +26,9 @@
             $this->__topic = explode('/', $this->__topicConfig['node']);
             $this->__topic = $this->__kafka->newTopic(end($this->__topic));
             
+            $topicConfig = $this->__topicConfig;
             unset($topicConfig['node'], $topicConfig['doc']);
+            
             foreach($topicConfig as $partition=>$offset) {
                 $this->__partition[$partition] = $this->__topicConfig['node'] . '/' . $partition;
                 /**
@@ -37,6 +38,8 @@
                  */
                 $this->__topic->consumeQueueStart($partition, $offset, $this->__queue);
             }
+            
+            $this->__log->info("{$this->__pid}，initialized。");
         }
         
         public function consumer($operation) {
@@ -53,7 +56,7 @@
                             $refer = $e->message;
                         }
                         
-                        $this->__log->info("P{$data->partition}O{$data->offset}T{$data->timestamp}，{$data->payload}，{$refer}。");
+                        $this->__log->info("P{$data->partition}O{$data->offset}，{$data->payload}，{$refer}。");
                     }
                     $this->__zookeeper->set($this->__partition[$data->partition], $data->offset);
                 }
@@ -63,6 +66,7 @@
         }
         
         public function __destruct() {
+            $this->__zookeeper = $this->__kafka =  $this->__queue = $this->__topic = null;
             $this->__log->info("{$this->__pid}，Stopped。");
         }
     }
