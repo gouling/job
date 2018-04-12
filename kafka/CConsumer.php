@@ -2,7 +2,7 @@
     class CConsumer {
         private $__pid, $__sig, $__log;
         private $__zookeeper, $__kafkaConfig, $__topicConfig;
-        private $__kafka, $__queue, $__topic;
+        private $__kafka, $__queue, $__topic, $__conf;
         private $__partition;
         
         public function __construct($zookeeper, $kafkaConfig, $topicConfig) {
@@ -18,7 +18,12 @@
         }
         
         private function __initialize() {
-            $this->__kafka =  new \RdKafka\Consumer();
+            pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
+            $this->__conf = new \RdKafka\Conf();
+            $this->__conf->set('internal.termination.signal', SIGIO);
+            $this->__conf->set('socket.blocking.max.ms', 5);
+        
+            $this->__kafka =  new \RdKafka\Consumer($this->__conf);
             $this->__kafka->setLogLevel(LOG_DEBUG);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
             

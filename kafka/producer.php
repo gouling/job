@@ -10,7 +10,12 @@
         ))
     );
 
-    $kafka = new \RdKafka\Producer();
+    pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
+    $conf = new \RdKafka\Conf();
+    $conf->set('internal.termination.signal', SIGIO);
+    $conf->set('socket.blocking.max.ms', 60);
+    
+    $kafka = new \RdKafka\Producer($conf);
     $kafka->setLogLevel(LOG_DEBUG);
     $kafka->addBrokers('192.168.253.170:9092');
 
