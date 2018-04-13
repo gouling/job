@@ -10,7 +10,7 @@
      */
     $kafka = new CProducer(array(
         'kafka' => '192.168.253.170:9092',
-        'log' => LOG_KERN,
+        'log' => LOG_DEBUG, //LOG_KERN
         'timeout' => 5,
         'topic' => 'tender'
     ));
