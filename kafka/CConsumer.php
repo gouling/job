@@ -18,11 +18,15 @@
         }
         
         private function __initialize() {
-            pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
             $this->__conf = new \RdKafka\Conf();
-            $this->__conf->set('internal.termination.signal', SIGIO);
             $this->__conf->set('socket.blocking.max.ms', 5);
-        
+            if (function_exists('pcntl_sigprocmask')) {
+                pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
+                $this->__conf->set('internal.termination.signal', SIGIO);
+            } else {
+                $this->__conf->set('queue.buffering.max.ms', 1);
+            }
+
             $this->__kafka =  new \RdKafka\Consumer($this->__conf);
             $this->__kafka->setLogLevel(LOG_DEBUG);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
