@@ -1,6 +1,6 @@
 <?php
     include 'CProducer.php';
-    
+
     /**
      * timeout 
      * 运维配置的keepalived息息相关，为确保高可用，建义大于运维配置时间值
@@ -9,8 +9,8 @@
      * 服务全部挂掉后将耗时3倍返回结果为false
      */
     $kafka = new CProducer(array(
-        'kafka' => '192.168.253.170:9093',
-        'log' => LOG_DEBUG,
+        'kafka' => '192.168.253.170:9092',
+        'log' => LOG_KERN,
         'timeout' => 5,
         'topic' => 'tender'
     ));
