@@ -1,5 +1,4 @@
 <?php
-    $time=microtime(true);
     include 'CProducer.php';
     
     /**
