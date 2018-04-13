@@ -10,16 +10,16 @@
             
             $this->__kafka = new \RdKafka\Producer();
             $this->__kafka->setLogLevel(LOG_DEBUG);
-            $this->__kafka->addBrokers($this->__data['ip'] . ':' . $this->__data['port']);
+            $this->__kafka->addBrokers($this->__data['kafka']);
             $this->__topic = $this->__kafka->newTopic($this->__data['topic']);
             
             parent::__construct($this->__data['timeout']);
         }
         
         public function send($data, $partition = RD_KAFKA_PARTITION_UA) {
-            if($this->isRunning($this->__data['ip'], $this->__data['port']) == false) {
+            if($this->isRunning($this->__data['kafka']) == false) {
                 sleep($this->__data['timeout']);
-                if($this->isRunning($this->__data['ip'], $this->__data['port']) == false) {
+                if($this->isRunning($this->__data['kafka']) == false) {
                     //此时为运维高可用配置已失效，所有服务挂掉，数据包丢失，需要特殊处理。
                     return false;
                 }

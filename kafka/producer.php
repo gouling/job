@@ -9,9 +9,8 @@
      * 服务全部挂掉后将耗时3倍返回结果为false
      */
     $kafka = new CProducer(array(
-        'ip' => '192.168.253.170',
-        'port' => 9092,
+        'kafka' => '192.168.253.170:9092',
         'timeout' => 5,
         'topic' => 'tender'
     ));
-    var_dump($kafka->send('this is new message'));
+    var_dump($kafka->send('蒋万勇'));
