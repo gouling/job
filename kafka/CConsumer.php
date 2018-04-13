@@ -42,7 +42,10 @@
                 $this->__partition[$partition] = $this->__topicConfig['node'] . '/' . $partition;
                 /**
                  * 分区标识
-                 * 消息标识 0=开始位置，-1=结束位置 需要记录最后处理的消息标识，启动时此标识开始取消息
+                 * 消息标识 启动时此标识开始取消息
+                 * RD_KAFKA_OFFSET_BEGINNING  0=开始位置
+                 * RD_KAFKA_OFFSET_END -1=结束位置 需要记录最后处理的消息标识
+                 * RD_KAFKA_OFFSET_STORED -1000
                  * 消息队列
                  */
                 $this->__topic->consumeQueueStart($partition, $offset, $this->__queue);
