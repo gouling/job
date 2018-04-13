@@ -9,8 +9,7 @@
     }
     
     $kafka = new CConsumer(array(
-        'zk' => '192.168.253.170:2181',
-        'kafka' => '/application/kafka',
+        'kafka' => '192.168.253.170:9092',
         'topic' => 'tender'
     ));
     $kafka->accept(array(new Demo(), 'set'));
