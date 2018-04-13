@@ -23,7 +23,7 @@
         
         private function __initialize() {
             $this->__kafka =  new \RdKafka\Consumer();
-            $this->__kafka->setLogLevel(LOG_DEBUG);
+            $this->__kafka->setLogLevel($this->__kafkaConfig['log']);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
             
             $this->__queue = $this->__kafka->newQueue();

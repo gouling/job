@@ -6,6 +6,7 @@
         
         '/application/kafka' => 'kafka服务，消费超时，延时微秒',
         '/application/kafka/host' => '192.168.253.170:9092',
+        '/application/kafka/log' => LOG_DEBUG,
         '/application/kafka/timeout' => 1000,
         '/application/kafka/delay' => 100000,
         

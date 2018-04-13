@@ -9,7 +9,8 @@
      * 服务全部挂掉后将耗时3倍返回结果为false
      */
     $kafka = new CProducer(array(
-        'kafka' => '192.168.253.170:9092',
+        'kafka' => '192.168.253.170:9093',
+        'log' => LOG_DEBUG,
         'timeout' => 5,
         'topic' => 'tender'
     ));
