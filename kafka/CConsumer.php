@@ -24,7 +24,7 @@
                 pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
                 $this->__conf->set('internal.termination.signal', SIGIO);
             } else {
-                $this->__conf->set('queue.buffering.max.ms', 1);
+                $this->__conf->set('queue.buffering.max.ms', 5);
             }
 
             $this->__kafka =  new \RdKafka\Consumer($this->__conf);
