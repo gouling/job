@@ -7,7 +7,6 @@
         
         public function __construct($data) {
             $this->__data = $data;
-            var_dump(LOG_DEBUG);
             $this->__kafka = new \RdKafka\Producer();
             $this->__kafka->setLogLevel($this->__data['log']);
             $this->__kafka->addBrokers($this->__data['kafka']);
