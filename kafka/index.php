@@ -1,8 +1,5 @@
 <?php
     include 'CZookeeper.php';
-    include 'CConsumer.php';
-    include 'CSignal.php';
-    include 'CLog.php';
     
     $application = array(
         '/application' => '系统全局数据与配置信息',
@@ -19,17 +16,4 @@
     );
     
     $zookeeper = new CZookeeper('192.168.253.170:2181');
-    //$zookeeper->create($application);
-    
-    $kafkaConfig = $zookeeper->get('/application/kafka');
-    $topicConfig = $zookeeper->get('/application/kafka/tender');
-
-    $consumer = new CConsumer($zookeeper, $kafkaConfig, $topicConfig);
-    
-    class Demo {
-        public function set($data) {
-            print_r($data);
-            return true;
-        }
-    }
-    $consumer->consumer(array(new Demo(), 'set'));
+    $zookeeper->create($application);

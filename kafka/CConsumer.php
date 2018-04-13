@@ -1,33 +1,28 @@
 <?php
+    include 'CZookeeper.php';
+    include 'CSignal.php';
+    include 'CLog.php';
+    
     class CConsumer {
         private $__pid, $__sig, $__log;
         private $__zookeeper, $__kafkaConfig, $__topicConfig;
-        private $__kafka, $__queue, $__topic, $__conf;
+        private $__kafka, $__queue, $__topic;
         private $__partition;
         
-        public function __construct($zookeeper, $kafkaConfig, $topicConfig) {
+        public function __construct($data) {
             $this->__pid = function_exists('posix_getpid') ? posix_getpid() : 'windows';
             $this->__sig = new CSignal();
             $this->__log = new CLog();
             
-            $this->__zookeeper = $zookeeper;
-            $this->__kafkaConfig = $kafkaConfig;
-            $this->__topicConfig = $topicConfig;
-            
+            $this->__zookeeper = new CZookeeper($data['zk']);
+            $this->__kafkaConfig = $this->__zookeeper->get($data['kafka']);
+            $this->__topicConfig = $this->__zookeeper->get($data['kafka'] . '/' . $data['topic']);
+
             $this->__initialize();
         }
         
         private function __initialize() {
-            $this->__conf = new \RdKafka\Conf();
-            $this->__conf->set('socket.blocking.max.ms', 5);
-            if (function_exists('pcntl_sigprocmask')) {
-                pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
-                $this->__conf->set('internal.termination.signal', SIGIO);
-            } else {
-                $this->__conf->set('queue.buffering.max.ms', 5);
-            }
-
-            $this->__kafka =  new \RdKafka\Consumer($this->__conf);
+            $this->__kafka =  new \RdKafka\Consumer();
             $this->__kafka->setLogLevel(LOG_DEBUG);
             $this->__kafka->addBrokers($this->__kafkaConfig['host']);
             
@@ -54,7 +49,7 @@
             $this->__log->info("{$this->__pid}，initialized。");
         }
         
-        public function consumer($operation) {
+        public function accept($operation) {
             $this->__log->info("{$this->__pid}，Running。");
             
             while (true) {

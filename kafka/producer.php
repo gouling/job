@@ -1,29 +1,18 @@
 <?php
-    $data = array(
-        'partition' => RD_KAFKA_PARTITION_UA,
-        'data' => 'this is default message'
-    );
+    $time=microtime(true);
+    include 'CProducer.php';
     
-    $conf = new \RdKafka\Conf();
-    $conf->set('socket.timeout.ms', 60);
-    if (function_exists('pcntl_sigprocmask')) {
-        pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
-        $conf->set('internal.termination.signal', SIGIO);
-    } else {
-        $conf->set('socket.blocking.max.ms', 5);
-    }
-
-    $kafka = new \RdKafka\Producer($conf);
-    $kafka->setLogLevel(LOG_DEBUG);
-    $kafka->addBrokers('192.168.253.170:9092');
-
-    $topic = $kafka->newTopic('tender');
     /**
-     * 分区标识 RD_KAFKA_PARTITION_UA
-     * 消息标识 当前始终为0
-     * 消息内容
+     * timeout 
+     * 运维配置的keepalived息息相关，为确保高可用，建义大于运维配置时间值
+     * 服务正常时0秒返回true
+     * 服务切换(keepalived)过程中最多2倍返回结果true
+     * 服务全部挂掉后将耗时3倍返回结果为false
      */
-    $topic->produce($data['partition'], 0, $data['data']);
-    while ($kafka->getOutQLen() > 0) {
-        $kafka->poll(1);
-    }
+    $kafka = new CProducer(array(
+        'ip' => '192.168.253.170',
+        'port' => 9092,
+        'timeout' => 5,
+        'topic' => 'tender'
+    ));
+    var_dump($kafka->send('this is new message'));
