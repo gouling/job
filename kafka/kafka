@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export PATH=$PATH:/usr/share/kafka-2.12/bin
+
+kafka-topics.sh --zookeeper 127.0.0.1:2181 --create --topic tender --partitions 3 --replication-factor 3
+kafka-topics.sh --zookeeper 127.0.0.1:2181 --list
