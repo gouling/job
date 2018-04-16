@@ -16,13 +16,9 @@
         }
         
         public function send($data, $partition = RD_KAFKA_PARTITION_UA) {
-            //检查当前服务是否可用，不可用时延时再检查，依然不可用时必定服务全挂掉。此检查在批量操作时有性能影响。
-            if($this->isRunning($this->__data['kafka']) == false) {
-                sleep($this->__data['timeout']);
-                if($this->isRunning($this->__data['kafka']) == false) {
-                    //此时为运维高可用配置已失效，所有服务挂掉，数据包丢失，需要特殊处理。
-                    return false;
-                }
+            if($this->__isRunning() == false) {
+                $this->__loseData($data, $partition);
+                return false;
             }
             
             /**
@@ -37,6 +33,26 @@
             }
             
             return true;
+        }
+        
+        /**
+         * 检查当前服务是否可用，不可用时延时再检查，依然不可用时服务全挂掉。此检查在批量操作时有性能影响。
+         */
+        private function __isRunning() {
+            if($this->isRunning($this->__data['kafka']) == false) {
+                sleep($this->__data['timeout']);
+                if($this->isRunning($this->__data['kafka']) == false) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        /**
+         * 可用配置失效，所有服务挂掉，数据包丢失，特殊处理。
+         */
+        private function __loseData($data, $partition) {
         }
         
         public function __destruct() {
