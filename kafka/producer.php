@@ -8,10 +8,14 @@
      * 服务切换(keepalived)过程中最多2倍返回结果true
      * 服务全部挂掉后将耗时3倍返回结果为false
      */
-    $kafka = new CProducer(array(
+    $tender = array(
         'kafka' => '192.168.253.170:9092',
+        'timeout' => 2,
+        'topic' => 'tender',
         'log' => LOG_DEBUG, //LOG_KERN
-        'timeout' => 5,
-        'topic' => 'tender'
-    ));
-    var_dump($kafka->send('蒋万勇'));
+        'data' => '/tmp/tender.data'    //服务不可用时，数据保存文件
+    );
+    $kafka = new CProducer($tender);
+    var_dump($kafka->send(array(
+        'name'=>'蒋万勇'
+    )));

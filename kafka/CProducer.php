@@ -16,6 +16,8 @@
         }
         
         public function send($data, $partition = RD_KAFKA_PARTITION_UA) {
+            $data = json_encode($data);
+            
             if($this->__isRunning() == false) {
                 $this->__loseData($data, $partition);
                 return false;
@@ -53,6 +55,14 @@
          * 可用配置失效，所有服务挂掉，数据包丢失，特殊处理。
          */
         private function __loseData($data, $partition) {
+            $ref = array(
+                time(),
+                $partition,
+               $data,
+                PHP_EOL,
+            );
+
+            file_put_contents($this->__data['data'], implode(' ', $ref), FILE_APPEND);
         }
         
         public function __destruct() {

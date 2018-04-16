@@ -64,9 +64,9 @@
                 $this->__sig->dispatch();
                 $data = $this->__queue->consume($this->__kafkaConfig['timeout']);
                 if (is_object($data)) {
-                    if($data->err == 0) {
+                    if($data->err == 0 && $payload = json_decode($data->payload, true)) {
                         try {
-                            $refer = call_user_func_array($operation, array($data)) === true ? 'Succeed' : 'Failed';
+                            $refer = call_user_func_array($operation, array($payload)) === true ? 'Succeed' : 'Failed';
                         } catch (\Exception $e) {
                             $refer = $e->message;
                         }
