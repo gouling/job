@@ -10,12 +10,6 @@
         private $__partition;
         
         public function __construct($data) {
-            //以下两项为内部配置项目
-            $data += array(
-                'zk' => '192.168.253.170:2181',
-                'root' => '/application/kafka',
-            );
-            
             $this->__pid = function_exists('posix_getpid') ? posix_getpid() : 'windows';
             $this->__sig = new CSignal();
             $this->__log = new CLog();
