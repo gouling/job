@@ -11,7 +11,7 @@
         }
         
         public function info($message) {
-            $this->__logHandle(sprintf('%s INFO %s%s', date('Y-m-d H:i:s'), $message, PHP_EOL));
+            $this->__logHandle(sprintf('%s INFO %s%s', time(), $message, PHP_EOL));
         }
         
         private function __logHandle($message) {
