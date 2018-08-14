@@ -3,6 +3,17 @@
     include 'CTask.php';
     include 'CSignal.php';
     include 'CLog.php';
-    include 'CCache.php';
     
-    new CTask();
+    class CData {
+        public function get():array {
+            return [
+                'time' => time()
+            ];
+        }
+        
+        public function set($data = []):bool {
+            return true;
+        }
+    }
+    
+    new CTask(new CData());
