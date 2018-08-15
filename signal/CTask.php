@@ -11,25 +11,8 @@
             $this->__log = new CLog();
             $this->__log->info("{$this->__pid}，已运行。");
             
-            $this->__listen();
-        }
-        
-        private function __listen() {
             try {
-                while(true) {
-                    $this->__sig->dispatch();
-
-                    if(!is_array($get = $this->__data->get())) {
-                        $this->__log->info('异常包' . PHP_EOL . print_r($get, true));
-                        continue;
-                    }
-                    
-                    $this->__log->info('数据包' . PHP_EOL . print_r($get, true));
-                    $set = $this->__data->set($get);
-                    $this->__log->info('处理包' . PHP_EOL . print_r($set, true));
-                    
-                    usleep(100000);
-                }
+                $this->__listen();
             } catch (\Exception $e) {
                 $this->__log->info(<<<LOG
 
@@ -43,6 +26,23 @@ LOG
                 );
             } finally {
                 
+            }
+        }
+        
+        private function __listen() {
+            while(true) {
+                $this->__sig->dispatch();
+
+                if(!is_array($get = $this->__data->get())) {
+                    $this->__log->info('异常包' . PHP_EOL . print_r($get, true));
+                    continue;
+                }
+                
+                $this->__log->info('数据包' . PHP_EOL . print_r($get, true));
+                $set = $this->__data->set($get);
+                $this->__log->info('处理包' . PHP_EOL . print_r($set, true));
+                
+                usleep(100000);
             }
         }
         
