@@ -32,15 +32,18 @@ status() {
 }
 
 start() {
+    echo 'Starting...'
+    sleep 2
+    
     for key in ${list[@]}
     do
         name=$(read $key name)
         service=$(read $key service)
-        log=$(read $key log)
+        log=$(read setting log)
         pid=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
         if [ -z $pid ]; then
             cd $(read $key work)
-            su $(read setting user) -c "${service} >> ${log} &"
+            su $(read setting user) -c "${service} >> ${log}/${key}.txt &"
         else
             case $pid in
                 'X') stop;;
@@ -51,6 +54,9 @@ start() {
 }
 
 stop() {
+    echo 'Stoping...'
+    sleep 2
+    
     for key in ${list[@]}
     do
         service=$(read $key service)
@@ -59,36 +65,30 @@ stop() {
 }
 
 restart() {
-	stop
-	start
+    stop
+    backup
+    start
+}
+
+backup() {
+    echo 'Backing...'
+    sleep 2
+    
+    cd $(read setting log)
+    tar -zcf `date '+%Y-%m-%dT%H-%M-%S'`'.tar.gz' *.txt >/dev/null 2>&1
+    rm -rf *.txt
 }
 
 daemon() {
     while true
     do
         start
-        sleep 1
+        sleep 5
     done &
 }
 
-reload() {
-    for key in ${list[@]}
-    do
-        service=$(read $key service)
-        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 12 >/dev/null 2>&1
-    done
-}
-
-recovery() {
-    for key in ${list[@]}
-    do
-        service=$(read $key service)
-        ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 10 >/dev/null 2>&1
-    done
-}
-
 if [ -z $1 ]; then
-	echo 'Please enter then service for [stop|start|status|reload|recovery|restart|daemon]'
+    echo 'Please enter then service for [stop|start|status|reload|recovery|restart|daemon]'
 else
     task=`pwd`/$(dirname $0)'/task'
     config="${task}.config"
@@ -99,13 +99,12 @@ else
     IFS=$OLD_IFS
 
     case $1 in
-        'reload') reload;;
-        'recovery') recovery;;
         'status') status;;
         'start') start;;
         'stop') stop;;
-		'restart') restart;;
+        'restart') restart;;
+        'backup') backup;;
         'daemon') daemon;;
-        *) echo 'Please enter then service for [stop|start|status|reload|recovery|restart|daemon]';;
+        *) echo 'Please enter then service for [stop|start|status|reload|recovery|restart|backup|daemon]';;
     esac
 fi
