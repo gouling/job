@@ -1,6 +1,6 @@
 <?php
-    $phar = new CPhar('signal.phar', 'signal');
-    $phar->create();
+    $phar = new CPhar('notify.phar', 'signal');
+    $phar->release();
     
     class CPhar {
         private $__name, $__composer;
