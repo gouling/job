@@ -89,9 +89,9 @@ daemon() {
 }
 
 if [ -z $1 ]; then
-    echo 'Please enter then service for [stop|start|status|reload|recovery|restart|backup|daemon]'
+    echo 'Please enter then service for [stop|start|status|restart|backup|daemon]'
 else
-    task=`pwd`/$(dirname $0)'/task'
+    task=$(cd `dirname $0`; pwd)'/task'
     config="${task}.config"
 
     OLD_IFS=$IFS
@@ -106,6 +106,6 @@ else
         'restart') restart;;
         'backup') backup;;
         'daemon') daemon;;
-        *) echo 'Please enter then service for [stop|start|status|reload|recovery|restart|backup|daemon]';;
+        *) echo 'Please enter then service for [stop|start|status|restart|backup|daemon]';;
     esac
 fi
