@@ -31,10 +31,7 @@ status() {
     done
 }
 
-start() {
-    echo 'Starting...'
-    sleep 2
-    
+start() {    
     for key in ${list[@]}
     do
         name=$(read $key name)
@@ -42,6 +39,8 @@ start() {
         log=$(read setting log)
         pid=`ps aux | grep "${service}" | grep -v grep | awk 'NR==1 {print $8}'`
         if [ -z $pid ]; then
+            echo "Starting ${key}..."
+            sleep 2
             cd $(read $key work)
             su $(read setting user) -c "${service} >> ${log}/${key}.txt &"
         else
@@ -53,12 +52,11 @@ start() {
     done
 }
 
-stop() {
-    echo 'Stoping...'
-    sleep 2
-    
+stop() {    
     for key in ${list[@]}
     do
+    	echo "Stoping ${key}..."
+    	sleep 2
         service=$(read $key service)
         ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 3 >/dev/null 2>&1
     done
