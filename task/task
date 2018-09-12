@@ -55,8 +55,8 @@ start() {
 stop() {    
     for key in ${list[@]}
     do
-    	echo "Stoping ${key}..."
-    	sleep 2
+        echo "Stoping ${key}..."
+        sleep 2
         service=$(read $key service)
         ps aux | grep "${service}" | grep -v grep | awk '{print $2}' | xargs kill -s 3 >/dev/null 2>&1
     done
