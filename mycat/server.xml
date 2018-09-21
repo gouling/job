@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mycat:server SYSTEM "server.dtd">
+<mycat:server xmlns:mycat="http://io.mycat/">
+    <system>
+        <property name="bindIp">0.0.0.0</property>
+        <property name="serverPort">8066</property>
+        <property name="managerPort">9066</property>
+        <property name="charset">utf8</property>
+        <property name="sqlExecuteTimeout">30</property>
+        <property name="idleTimeout">1800000</property>
+        <property name="useSqlStat">1</property> 
+        <property name="useGlobleTableCheck">0</property>
+        <property name="sequnceHandlerType">0</property>
+        <property name="processorBufferPoolType">0</property>
+        <property name="handleDistributedTransactions">0</property>
+        <property name="useOffHeapForMerge">1</property>
+        <property name="memoryPageSize">1m</property>
+        <property name="spillsFileBufferSize">1k</property>
+        <property name="useStreamOutput">0</property>
+        <property name="systemReserveMemorySize">384m</property>
+        <property name="useZKSwitch">false</property>
+        <property name="defaultSqlParser">druidparser</property>
+    </system>
+    
+    <firewall> 
+        <whitehost>
+            <host host="*" user="root,user"/>
+        </whitehost>
+        <blacklist check="false">
+        </blacklist>
+    </firewall>
+
+    <user name="root">
+        <property name="password">root</property>
+        <property name="schemas">edai_tender</property>
+    </user>
+
+    <user name="user">
+        <property name="password">user</property>
+        <property name="schemas">edai_tender</property>
+        <property name="readOnly">true</property>
+    </user>
+</mycat:server>

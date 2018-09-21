@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mycat:rule SYSTEM "rule.dtd">
+<mycat:rule xmlns:mycat="http://io.mycat/">
+	<tableRule name="sharding_bc_mod_long">
+		<rule>
+			<columns>auth_id</columns>
+			<algorithm>bc_mod_long</algorithm>
+		</rule>
+	</tableRule>
+	<tableRule name="sharding_asset_borrow_mod_long">
+		<rule>
+			<columns>borrow_nid</columns>
+			<algorithm>match_mod_long</algorithm>
+		</rule>
+	</tableRule>
+	<tableRule name="sharding_asset_user_mod_long">
+		<rule>
+			<columns>user_id</columns>
+			<algorithm>match_mod_long</algorithm>
+		</rule>
+	</tableRule>
+	<tableRule name="sharding_match_borrow_mod_long">
+		<rule>
+			<columns>borrow_nid</columns>
+			<algorithm>match_mod_long</algorithm>
+		</rule>
+	</tableRule>
+	<tableRule name="sharding_match_user_mod_long">
+		<rule>
+			<columns>owner_userid</columns>
+			<algorithm>match_mod_long</algorithm>
+		</rule>
+	</tableRule>
+
+	<function name="bc_mod_long" class="io.mycat.route.function.PartitionByMod">
+		<property name="count">2</property>
+	</function>
+	<function name="match_mod_long" class="io.mycat.route.function.PartitionByMod">
+		<property name="count">10</property>
+	</function>
+</mycat:rule>

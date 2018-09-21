@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+<mycat:schema xmlns:mycat="http://io.mycat/">
+    <schema name="edai_tender" checkSQLschema="false" sqlMaxLimit="10">
+        <table name="edai_borrow" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="edai_borrow_recover" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="edai_borrow_repay" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="edai_match_list" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="edai_borrow_tender_id" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="edai_match_asset_id" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="edai_match_asset_borrow" subTables="edai_match_asset_borrow$1-10" dataNode="edaip2p_account" primaryKey="id" rule="sharding_asset_borrow_mod_long"/>
+        <table name="edai_match_asset_user" subTables="edai_match_asset_user$1-10" dataNode="edaip2p_account" primaryKey="id" rule="sharding_asset_user_mod_long"/>
+        <table name="edai_match_tender_borrow" subTables="edai_match_tender_borrow$1-10" dataNode="edaip2p_account" primaryKey="id" rule="sharding_match_borrow_mod_long"/>
+        <table name="edai_match_tender_user" subTables="edai_match_tender_user$1-10" dataNode="edaip2p_account" primaryKey="id" rule="sharding_match_user_mod_long"/>
+        <table name="edai_wb_whitelist" dataNode="edaip2p_account" primaryKey="id"/>
+        <table name="bc_linkages" primaryKey="id" dataNode="bcslave_00"/>
+        <table name="bc_account" dataNode="bcmaster_00,bcmaster_01" primaryKey="auth_id" rule="sharding_bc_mod_long"/>
+        <table name="bc_account_log" dataNode="bcmaster_00,bcmaster_01" primaryKey="auth_id" rule="sharding_bc_mod_long"/>
+        <table name="bc_account_platform" dataNode="bcmaster_00,bcmaster_01" primaryKey="auth_id" rule="sharding_bc_mod_long"/>
+        <table name="bc_tmp_task" dataNode="edaip2p_account" primaryKey="id"/>
+    </schema>
+
+    <dataNode name="edaip2p_account" dataHost="edaip2p_account" database="edaip2p_account" />
+    <dataNode name="bcslave_00" dataHost="bcslave_00" database="billingcenter00" />
+    <dataNode name="bcmaster_00" dataHost="bcmaster_00" database="billingcenter" />
+    <dataNode name="bcmaster_01" dataHost="bcmaster_01" database="billingcenter" />
+    <dataNode name="bcmaster_read" dataHost="bcmaster_read" database="billingcenter" />
+
+    <dataHost name="edaip2p_account" maxCon="1000" minCon="10" balance="0"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="0" slaveThreshold="100">
+        <heartbeat>SELECT unix_timestamp()</heartbeat>
+        <writeHost host="192.168.253.224" url="192.168.253.224:3306" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;" />
+    </dataHost>
+    <dataHost name="bcslave_00" maxCon="1000" minCon="10" balance="3"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="0" slaveThreshold="100">
+        <heartbeat>SELECT unix_timestamp()</heartbeat>
+        <writeHost host="192.168.253.253" url="192.168.253.253:3306" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;">
+            <readHost host="192.168.253.253" url="192.168.253.253:3306" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;"/>
+        </writeHost>
+    </dataHost>
+    <!-- billingcenter 偶库 -->
+    <dataHost name="bcmaster_00" maxCon="1000" minCon="10" balance="0"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="0" slaveThreshold="100">
+        <heartbeat>SELECT unix_timestamp()</heartbeat>
+        <writeHost host="192.168.253.253" url="192.168.253.253:3308" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;"/>
+    </dataHost>
+    <!-- billingcenter 奇库 -->
+    <dataHost name="bcmaster_01" maxCon="1000" minCon="10" balance="0"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="0" slaveThreshold="100">
+        <heartbeat>SELECT unix_timestamp()</heartbeat>
+        <writeHost host="192.168.253.253" url="192.168.253.253:3307" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;"/>
+    </dataHost>
+    <!-- billingcenter 集合库 -->
+    <dataHost name="bcmaster_read" maxCon="1000" minCon="10" balance="3"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="0" slaveThreshold="100">
+        <heartbeat>SELECT unix_timestamp()</heartbeat>
+        <writeHost host="192.168.253.250" url="192.168.253.250:3306" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;">
+            <readHost host="192.168.253.250" url="192.168.253.250:3306" user="p2p_kaifa" password="p2p_kaifa&lt;2015&gt;"/>
+        </writeHost>
+    </dataHost>
+</mycat:schema>
