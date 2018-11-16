@@ -1,0 +1,36 @@
+TRUNCATE account;
+TRUNCATE account_identity_relation;
+TRUNCATE identity;
+TRUNCATE organization;
+TRUNCATE identity_company;
+TRUNCATE organization_identity_relation;
+TRUNCATE organization_level;
+TRUNCATE `user`;
+TRUNCATE work_chat_account;
+TRUNCATE work_chat_department_organization_relation;
+TRUNCATE work_chat_organization;
+TRUNCATE identity_permission_group_relation;
+
+TRUNCATE account;
+TRUNCATE account_work_chat;
+TRUNCATE identity;
+TRUNCATE identity_account_relation;
+TRUNCATE identity_company;
+TRUNCATE identity_organization_relation;
+TRUNCATE organization;
+TRUNCATE organization_company;
+TRUNCATE organization_work_chat;
+TRUNCATE organization_work_chat_department_relation;
+TRUNCATE user;
+
+print_r($this->__chat->getAuthInfo([
+            1 => [
+                'auth_corp_id' => $this->__corp,
+                'permanent_code' => $this->__chat->getPermanentCode([
+                    'suite_id' => $this->__suite,
+                    'corp_id' => $this->__corp
+                ]),
+            ]
+        ],$this->__chat->getSuiteToken([
+            'suite_id' => $this->__suite
+        ])));
