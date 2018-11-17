@@ -1,15 +1,15 @@
 TRUNCATE account;
 TRUNCATE account_identity_relation;
 TRUNCATE identity;
-TRUNCATE organization;
 TRUNCATE identity_company;
+TRUNCATE identity_permission_group_relation;
+TRUNCATE organization;
 TRUNCATE organization_identity_relation;
 TRUNCATE organization_level;
 TRUNCATE `user`;
 TRUNCATE work_chat_account;
 TRUNCATE work_chat_department_organization_relation;
 TRUNCATE work_chat_organization;
-TRUNCATE identity_permission_group_relation;
 
 TRUNCATE account;
 TRUNCATE account_work_chat;
