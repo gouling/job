@@ -1,2 +1,2 @@
 # job
-php excel nulti hbase solr kafka
+php excel nulti hbase solr kafka signal
