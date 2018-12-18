@@ -1,13 +1,24 @@
 <?php
-    require('Chat.php');
-    require('Sync.php');
+    require(__DIR__ . '/vendor/autoload.php');
     
+    $database = new \Databases\MySQL([
+        'dsn' => 'mysql:host=127.0.0.1;dbname=sync',
+        'username' => 'root',
+        'password' => 'root',
+        'options' => array(
+            PDO::ATTR_PERSISTENT => true,
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'utf8\''
+        )
+    ]);
     $opts = [
         'suite_id' => 'wxb388a3469a14426b',
         'corp_id' => 'wwfd9b94c8c22a0bdf',
-        'token' => 'ni6bBmtw5Nwnil_Pw9IJejPNZRbZ9bJYovkJWcnnMwTqVOBmzWGvQY5Si9c9cIJ8HzHRnjf_m7PwHtXFogZeAr0K1zlCkucCiqgl9e5qXkCx1CQDdjb3JPfVDdfbfQVMp-hZ13dbNb5gOkfg8xp4hTbV4U0vmSaO6WOg29Zerk4_ez3EeUsT7vrt_YayYWvT00dTgazNuiYW_AFD0EsnLg',
+        'token' => 'b-gbykg8srE66Ta7CaXMreggxnBtXdHNKPos1nMAvshPgLqnR6Yso2odK_gFiUpj1BfmuidNfgXkfhxNawmHoqMv8I45pCvS84IvoyBG4uCqVDc94XrzBqXyG_Pq2LCGNVqk3ExXJGi5OfXVEKxxTPvMS6s8YzFL3fmh-kn1-Ng8AIdD87vG84VZBAB0BaYyc_AXXcykX_RJ2XGfRBm2kA',
     ];
-    $sync = new Sync($opts);
-    print_r($sync->auth());
     
+    $sync = new \Synchronizes\Sync($opts);
+    $sync->setDatabase($database);
     
+    $sync->create();
+    $sync->updateParentId();
+    $sync->updateLevel();
