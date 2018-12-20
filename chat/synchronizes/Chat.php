@@ -26,6 +26,7 @@
  
             if($data = $this->getApi($address)) {
                 if($data['errcode'] == 0) {
+                    // 以层级编号为key，层级信息为val的数组，为检查顶层不存在时创建顶层做准备
                     return array_combine(array_column($data['department'], 'id'), $data['department']);
                 } else {
                     throw new \Exception($data['errmsg'], $data['errcode']);

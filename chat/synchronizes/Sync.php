@@ -31,6 +31,9 @@
                 'departs' => implode(',', array_keys($departs))
             ]);
             
+            // 移除不可见层信息
+            $this->deleteLevel($auth);
+            
             // 企业微信接入信息
             $this->updateEnt($auth);
 
@@ -58,7 +61,7 @@
             $auth += [
                 'updated' => $this->time,
             ];
-            if(is_null($this->getEntById($auth['id']))) {
+            if(is_null($this->getEntById())) {
                 $ent = $this->database->create('chat_ent', $auth);
             } else {
                 $ent = $this->database->update('chat_ent', $auth);
@@ -176,9 +179,16 @@
             }
         }
 
-        public function getEntById($id) {
+        public function deleteLevel($auth) {
+            $history = $this->getEntById();
+            $delete = array_diff(explode(',', $history['departs']), explode(',', $auth['departs']));
+            foreach($delete as $id) {
+            }
+        }
+
+        public function getEntById() {
             if($ent = $this->database->query('SELECT * FROM chat_ent WHERE id=:id', [
-                ':id' => $id,
+                ':id' => $this->opts['id'],
             ])) {
                 return array_shift($ent);
             }
