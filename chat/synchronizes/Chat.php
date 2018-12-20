@@ -8,23 +8,25 @@
         
         protected $opts = [];
         
-        public function __construct(array $opts) {
+        public final function __construct(array $opts) {
             $this->opts = $opts;
         }
         
         public function getAuthInfo() {
             return [
-                'id' => $this->opts['corp_id'],
+                'id' => $this->opts['id'],
                 'name' => 'MichaelYoungBusiness',
+                'departs' => '',
+                'users' => ''
             ];
         }
 
         public function getDeparts():array {
             $address = str_ireplace(':token', $this->opts['token'], self::API_GET_DEPART_LIST);
-
+ 
             if($data = $this->getApi($address)) {
                 if($data['errcode'] == 0) {
-                    return $data['department'];
+                    return array_combine(array_column($data['department'], 'id'), $data['department']);
                 } else {
                     throw new \Exception($data['errmsg'], $data['errcode']);
                 }
@@ -35,7 +37,7 @@
         
         public function getUsers($id):array {
             $address = str_ireplace([':token', ':id'], [$this->opts['token'], $id], self::API_GET_USER_LIST);
-
+            
             if($data = $this->getApi($address)) {
                 if($data['errcode'] == 0) {
                     return $data['userlist'];
@@ -69,6 +71,29 @@
                 CURLOPT_HEADER => 0,
                 CURLOPT_RETURNTRANSFER => 1,
                 CURLOPT_TIMEOUT => 5,
+            ];
+
+            curl_setopt_array($http, $opts);
+
+            try {
+                if($data = curl_exec($http)) {
+                    $data = json_decode($data, true);
+                }
+            } finally {
+                curl_close($http);
+            }
+
+            return $data;
+        }
+        
+        protected function postApi($address, $data) {
+            $http = curl_init();
+            $opts = [
+                CURLOPT_URL => $address,
+                CURLOPT_HEADER => 0,
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_TIMEOUT => 5,
+                CURLOPT_POSTFIELDS => http_build_query($data)
             ];
 
             curl_setopt_array($http, $opts);
