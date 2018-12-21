@@ -11,41 +11,55 @@
             if($ds->execute($params) == true) {
                 return $ds->fetchAll(self::FETCH_ASSOC);
             } else {
-                throw new \Exception(implode('->', $ds->errorInfo()), $ds->errorCode());
+                throw new \Exception(implode('->', $ds->errorInfo()), 500);
             }
         }
 
         public function execute($statement, $params = []) {
             $ds = $this->prepare($statement);
-            $ex = [];
             
-            if($ds->execute($params) == false) {
-                $ex = [
-                    'code' => $ds->errorCode(),
-                    'message' => implode('->', $ds->errorInfo()),
+            if($ds->execute($params) == true) {
+                return [
+                    'affected_rows' => $ds->rowCount(),
+                    'last_insert_id' => (int)$this->lastInsertId()
                 ];
+            } else {
+                throw new \Exception(implode('->', $ds->errorInfo()), 500);
             }
-    
-            return [
-                'affected_rows' => $ds->rowCount(),
-                'last_insert_id' => (int)$this->lastInsertId(),
-                'exception' => $ex
-            ];
         }
         
-        public function tree($items, $id, $parentId) {
+        public function tree($items, $id, $parent_id) {
             $tree = [];
             $items = array_combine(array_column($items, $id), $items);
             
             foreach ($items as $item) {
-                if (isset($items[$item[$parentId]])) {
-                    $items[$item[$parentId]]['children'][$item[$id]] = &$items[$item[$id]];
+                if (isset($items[$item[$parent_id]])) {
+                    $items[$item[$parent_id]]['children'][$item[$id]] = &$items[$item[$id]];
                 } else {
                     $tree[$item[$id]] = &$items[$item[$id]];
                 }
             }
             
             return $tree;
+        }
+        
+        public function level(&$items, $id, $parent_id) {
+            $state = false;
+            foreach($items as &$v) {
+                if($v[$id] == 1 && $v[$parent_id] == 0) {
+                    $v['rel'] = $v[$id];
+                } else if(isset($items[$v[$parent_id]])) {
+                    if(!empty($items[$v[$parent_id]]['rel'])) {
+                        $v['rel'] = $items[$v[$parent_id]]['rel'] . ',' . $v[$id];
+                    } else {
+                        $state = true;
+                    }
+                }
+            }
+            
+            if($state == true) {
+                $this->level($items, $id, $parent_id);
+            }
         }
         
         public function create($table, $params) {

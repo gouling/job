@@ -12,7 +12,7 @@
     ]);
     $opts = [
         'id' => 'wwfd9b94c8c22a0bdf',
-        'token' => 'kgN5V9Qdm5Ib9q5SmjEEIR5ClmR7YtPyoJwrimSXG-yv9ycsC3mvb3juDmXbmEWe8TqVL0beAI2sJqiXjHSeLhiVCeUGU0QNEWMwxQ76AWpm2_cKc0OzXrYF8rT0XjuT7jePvi7WjUHpTyqA6f2LSYiK0fHl47YLqcgVDvJlEwKKxtWwCljJfemFN0hZQj3_csnjuuO3R5NkuaCUCzxM4g',
+        'token' => 'gmchIxRHixFYorN3ZdS-x336unAkgcbCPSkzKGmV8q4sNqbsNmlsVTDCh6bL_3xpWNI6nGYsXA41mhWEdXLZN0RWSgZfJCjR3LZPxKNw4bu6lAj7o8Qjg2y9JirBBDvf122rKBYQFbEunb9zPWUZ-vLVs1P2Ku_5Yq-oWKD7N7KocEwuIp4gG2iye9bxqwfLTk5-Z39T9rqck68qW2eVbw',
     ];
     
     $sync = new \Synchronizes\Sync($opts);

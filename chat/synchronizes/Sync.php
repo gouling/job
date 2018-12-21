@@ -2,13 +2,8 @@
     namespace Synchronizes;
     
     class Sync extends Chat {
-        protected $time = 0;
         public function auth() {
-            $this->time = time();
-            
             $this->update();
-            $this->updateParentId();
-            $this->updateRel();
         }
         
         public function update() {
@@ -37,17 +32,48 @@
             // 企业微信接入信息
             $this->updateEnt($auth);
 
-            foreach($departs as $depart) {
+            $this->database->beginTransaction();
+            try {
+                // 企业微信与系统层级信息
+                foreach($departs as $depart) {
+                    $this->updateLevel($depart);
+                }
+                $this->database->commit();
+            } catch (\Exception $e) {
+                $this->database->rollback();
+                exit('企业信息写入失败。');
+            }
+            
+            // 更新系统层级信息与关系信息
+            $this->updateParentId();
+            $this->updateRel();
+            
+            // 获取企业微信层级包含与系统层级的关系信息，为更新用户部门做准备
+            $chat_level = $this->database->query('SELECT * FROM chat_level ORDER BY id ASC');
+            $chat_level = array_combine(array_column($chat_level, 'id'), $chat_level);
+            $root_level = $this->getChatRootLevel();
+            
+            // 可见层级用户信息
+            foreach($departs as $id=>$depart) {
                 try {
-                    $users = $this->getUsers($depart['id']);
+                    $users = $this->getUsers($id);
                 } catch (\Exception $e) {
                     $users = [];
                 }
 
                 $this->database->beginTransaction();
                 try {
-                    $this->updateLevel($depart);
                     foreach($users as $user) {
+                        $user['level'] = [];
+                        foreach($user['department'] as $v) {
+                            if(isset($chat_level[$v])) {
+                                $user['level'][] = $chat_level[$v]['level_id'];
+                            }
+                        }
+                        if(empty($user['level'])) {
+                            $user['level'] = $root_level['level_id'];
+                        }
+                        
                         $this->updateUser($user);
                     }
                     $this->database->commit();
@@ -58,17 +84,10 @@
         }
         
         public function updateEnt($auth) {
-            $auth += [
-                'updated' => $this->time,
-            ];
             if(is_null($this->getEntById())) {
                 $ent = $this->database->create('chat_ent', $auth);
             } else {
                 $ent = $this->database->update('chat_ent', $auth);
-            }
-            
-            if($ent['affected_rows'] == 0) {
-                throw new \Exception("更新企业微信企业信息时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
             }
         }
         
@@ -78,112 +97,67 @@
                 ':id' => $depart['id'],
             ])) {
                 $chat = array_shift($chat);
-                $updated_chat = $this->database->execute('UPDATE chat_level SET parent_id=:parent_id,updated=:updated WHERE ent_id=:ent_id AND id=:id', [
+                $this->database->execute('UPDATE chat_level SET parent_id=:parent_id WHERE ent_id=:ent_id AND id=:id', [
                     ':ent_id' => $this->opts['id'],
                     ':id' => $depart['id'],
                     ':parent_id' =>  $depart['parentid'],
-                    ':updated' => $this->time,
                 ]);
-                if($updated_chat['affected_rows'] == 0) {
-                    throw new \Exception("更新企业微信组织层级关系时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
-                }
                 
-                $updated_sys = $this->database->update('sys_level', [
+                $this->database->update('level', [
                     'id' => $chat['level_id'],
                     'name' => $depart['name'],
-                    'updated' => $this->time,
                 ]);
-                if($updated_sys['affected_rows'] == 0) {
-                    throw new \Exception("更新系统组织层级关系时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
-                }
             } else {
-                $created_sys = $this->database->create('sys_level', [
+                $created = $this->database->create('level', [
                     'name' => $depart['name'],
                     'parent_id' => 0,
-                    'updated' => $this->time,
                 ]);
-                if($created_sys['affected_rows'] == 0) {
-                    throw new \Exception("创建系统组织层级关系时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
-                }
-                
-                $created_chat = $this->database->create('chat_level', [
+ 
+                $this->database->create('chat_level', [
                     'id' => $depart['id'],
                     'parent_id' => $depart['parentid'],
-                    'level_id' => $created_sys['last_insert_id'],
+                    'level_id' => $created['last_insert_id'],
                     'ent_id' => $this->opts['id'],
-                    'updated' => $this->time,
                 ]);
-                if($created_chat['affected_rows'] == 0) {
-                    throw new \Exception("创建企业微信组织层级关系时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
-                }
                 
-                return $created_sys['last_insert_id'];
+                return $created['last_insert_id'];
             }
         }
         
         public function updateUser($user) {
+            $columns = ['name', 'gender', 'position', 'status'];
+            $values = [
+                'level' => implode(',', $user['level'])
+            ];
+            
+            foreach($columns as $k) {
+                if(isset($user[$k])) {
+                    $values[$k] = $user[$k];
+                }
+            }
+            
             $chat = $this->getChatById($user['userid']);
             if(is_null($chat)) {
-                $created_sys = $this->database->create('sys_user', [
-                    'name' => $user['name'],
-                    'gender' => $user['gender'],
-                    'position' => $user['position'] ?? '',
-                    'mobile' => $user['mobile'] ?? '',
-                    'email' => $user['email'] ?? '',
-                    'avatar' => $user['avatar'],
-                    'enable' => $user['enable'] ?? 1,
-                    'status' => $user['status'],
-                    'level' => implode(',', $user['department']),
-                    'updated' => $this->time,
-                ]);
-                if($created_sys['affected_rows'] == 0) {
-                    throw new \Exception("创建系统用户时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
-                }
+                $created = $this->database->create('user', $values);
                 
-                $created_chat = $this->database->create('chat_user', [
+                $this->database->create('chat_user', [
                     'ent_id' => $this->opts['id'],
                     'chat_id' => $user['userid'],
-                    'user_id' => $created_sys['last_insert_id'],
-                    'updated' => $this->time,
+                    'user_id' => $created['last_insert_id'],
                 ]);
-                if($created_chat['affected_rows'] == 0) {
-                    throw new \Exception("创建企业微信用户时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理。", 500);
-                }
             } else {
-                $updated_chat = $this->database->execute('UPDATE chat_user SET chat_id=:chat_id,updated=:updated WHERE ent_id=:ent_id AND chat_id=:chat_id', [
+                $this->database->execute('UPDATE chat_user SET chat_id=:chat_id WHERE ent_id=:ent_id AND chat_id=:chat_id', [
                     ':ent_id' => $this->opts['id'],
                     ':chat_id' => $user['userid'],
-                    ':updated' => $this->time,
                 ]);
-                if($updated_chat['affected_rows'] == 0 && isset($updated_chat['exception']['code'])) {
-                    throw new \Exception("更新企业微信用户时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理({$updated_chat['exception']['message']})。", $updated_chat['exception']['code']);
-                }
                 
-                $updated_sys_columns = ['name', 'gender', 'position', 'mobile', 'email', 'avatar', 'enable', 'status', 'level'];
-                $updated_sys_values = [
-                    'level' => implode(',', $user['department']),
+                $this->database->update('user', $values + [
                     'id' => $chat['user_id'],
-                    'updated' => $this->time,
-                ];
-                
-                foreach($updated_sys_columns as $k) {
-                    if(isset($user[$k])) {
-                        $updated_sys_values[$k] = $user[$k];
-                    }
-                }
-                
-                $updated_sys = $this->database->update('sys_user', $updated_sys_values);
-                if($updated_sys['affected_rows'] == 0 && isset($updated_sys['exception']['code'])) {
-                    throw new \Exception("更新系统用户时服务器遇到了一个未曾预料的状况，导致了它无法完成对请求的处理({$updated_sys['exception']['message']})。", $updated_sys['exception']['code']);
-                }
+                ]);
             }
         }
 
         public function deleteLevel($auth) {
-            $history = $this->getEntById();
-            $delete = array_diff(explode(',', $history['departs']), explode(',', $auth['departs']));
-            foreach($delete as $id) {
-            }
         }
 
         public function getEntById() {
@@ -204,7 +178,7 @@
         }
         
         public function getUserById($id) {
-            if($user = $this->database->execute('SELECT * FROM sys_user WHERE id=:id', [
+            if($user = $this->database->execute('SELECT * FROM user WHERE id=:id', [
                 ':id' => $id,
             ])) {
                 return array_shift($user);
@@ -216,44 +190,26 @@
         }
         
         public function updateRel() {
-            $state = true;
+            $sys = $this->database->query('SELECT * FROM level ORDER BY parent_id ASC');
+            $tree = array_combine(array_column($sys, 'id'), $sys);
+            $this->database->level($tree, 'id', 'parent_id');
             
-            $sys = $this->database->query('SELECT * FROM sys_level ORDER BY id ASC');
-            $sys = array_combine(array_column($sys, 'id'), $sys);
-            $root = $this->getSysRootLevel();
-
             $this->database->beginTransaction();
             try {
-                foreach($sys as $id => $v) {
-                    if($v['parent_id'] == 0) {
-                        $rel = $id;
-                    } else if(!isset($sys[$v['parent_id']])) {
-                        $rel = $root['rel'] . ',' . $id;
-                    } else if($sys[$v['parent_id']]['rel'] != '') {
-                        $rel = $sys[$v['parent_id']]['rel'] . ',' . $id;
-                    } else {
-                        $state = false;
-                        continue;
-                    }
-
-                    $this->database->execute('UPDATE sys_level SET rel=:rel WHERE id=:id', [
-                        ':rel' => $rel,
-                        ':id' => $id
+                foreach($tree as $v) {
+                    $this->database->execute('UPDATE level SET rel=:rel WHERE id=:id', [
+                        ':rel' => $v['rel'],
+                        ':id' => $v['id']
                     ]);
                 }
                 $this->database->commit();
             } catch (\Exception $e) {
                 $this->database->rollback();
-                $state = false;
-            }
-            
-            if($state == false) {
-                $this->updateRel();
             }
         }
-        
+
         public function updateParentId() {
-            $sys = $this->database->query('SELECT * FROM sys_level ORDER BY id ASC');
+            $sys = $this->database->query('SELECT * FROM level ORDER BY id ASC');
             $chat = $this->database->query('SELECT * FROM chat_level ORDER BY id ASC');
             
             $sys = array_combine(array_column($sys, 'id'), $sys);
@@ -266,7 +222,7 @@
                     if($v['parent_id'] != 0) {
                         $parent_id = isset($chat[$v['parent_id']]) ? $chat[$v['parent_id']]['level_id'] : $root['level_id'];
                         
-                        $this->database->execute('UPDATE sys_level SET parent_id=:parent_id WHERE id=:id', [
+                        $this->database->execute('UPDATE level SET parent_id=:parent_id WHERE id=:id', [
                             ':parent_id' => $parent_id,
                             ':id' => $v['level_id']
                         ]);
@@ -287,7 +243,7 @@
         }
         
         protected function getSysRootLevel() {
-            if($root = $this->database->query('SELECT * FROM sys_level WHERE id=1 AND parent_id=0')) {
+            if($root = $this->database->query('SELECT * FROM level WHERE id=1 AND parent_id=0')) {
                 return array_shift($root);
             }
             
