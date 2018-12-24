@@ -9,6 +9,8 @@
         public function cancel() {
             $trans = [
                 "DELETE FROM chat_ent WHERE id='{$this->opts['id']}'",
+                "DELETE FROM level_user USING level_user,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level_user.level_id=chat_level.level_id",
+                "DELETE FROM level_user USING level_user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND level_user.user_id=chat_user.user_id",
                 "DELETE FROM level USING level,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level.id=chat_level.level_id",
                 "DELETE FROM chat_level WHERE ent_id='{$this->opts['id']}'",
                 "DELETE FROM user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND user.id=chat_user.user_id",
@@ -148,15 +150,14 @@
         }
         
         public function updateLevel($depart) {
-            if($chat = $this->database->query('SELECT * FROM chat_level WHERE ent_id=:ent_id AND id=:id', [
-                ':ent_id' => $this->opts['id'],
-                ':id' => $depart['id'],
+            if($chat = $this->database->find('SELECT * FROM chat_level WHERE ent_id=:ent_id AND id=:id', [
+                'ent_id' => $this->opts['id'],
+                'id' => $depart['id'],
             ])) {
-                $chat = array_shift($chat);
                 $this->database->execute('UPDATE chat_level SET parent_id=:parent_id WHERE ent_id=:ent_id AND id=:id', [
-                    ':ent_id' => $this->opts['id'],
-                    ':id' => $depart['id'],
-                    ':parent_id' =>  $depart['parentid'],
+                    'ent_id' => $this->opts['id'],
+                    'id' => $depart['id'],
+                    'parent_id' =>  $depart['parentid'],
                 ]);
                 
                 $this->database->update('level', [
@@ -197,47 +198,54 @@
             $chat = $this->getChatById($user['userid']);
             if(is_null($chat)) {
                 $created = $this->database->create('user', $values);
-                
                 $this->database->create('chat_user', [
                     'ent_id' => $this->opts['id'],
                     'chat_id' => $user['userid'],
                     'user_id' => $created['last_insert_id'],
                 ]);
+                $chat = $this->getChatById($user['userid']);
             } else {
                 $this->database->execute('UPDATE chat_user SET chat_id=:chat_id WHERE ent_id=:ent_id AND chat_id=:chat_id', [
-                    ':ent_id' => $this->opts['id'],
-                    ':chat_id' => $user['userid'],
+                    'ent_id' => $this->opts['id'],
+                    'chat_id' => $user['userid'],
                 ]);
                 
                 $this->database->update('user', $values + [
                     'id' => $chat['user_id'],
                 ]);
             }
+            
+            foreach($user['level'] as $level_id) {
+                $this->updateLevelUser($level_id, $chat['user_id']);
+            }
+        }
+        
+        public function updateLevelUser($level_id, $user_id) {
+            $data = compact('level_id', 'user_id');
+            
+            $rel = $this->database->find('SELECT * FROM level_user WHERE level_id=:level_id AND user_id=:user_id', $data);
+            if(is_null($rel)) {
+                $this->database->create('level_user', $data);
+            }
         }
 
         public function getEntById() {
-            if($ent = $this->database->query('SELECT * FROM chat_ent WHERE id=:id', [
-                ':id' => $this->opts['id'],
-            ])) {
-                return array_shift($ent);
-            }
+            return $this->database->find('SELECT * FROM chat_ent WHERE id=:id', [
+                'id' => $this->opts['id'],
+            ]);
         }
         
         public function getChatById($id) {
-            if($chat = $this->database->query('SELECT * FROM chat_user WHERE ent_id=:ent_id AND chat_id=:chat_id', [
-                ':ent_id' => $this->opts['id'],
-                ':chat_id' => $id,
-            ])) {
-                return array_shift($chat);
-            }
+            return $this->database->find('SELECT * FROM chat_user WHERE ent_id=:ent_id AND chat_id=:chat_id', [
+                'ent_id' => $this->opts['id'],
+                'chat_id' => $id,
+            ]);
         }
         
         public function getUserById($id) {
-            if($user = $this->database->execute('SELECT * FROM user WHERE id=:id', [
-                ':id' => $id,
-            ])) {
-                return array_shift($user);
-            }
+            return $this->database->find('SELECT * FROM user WHERE id=:id', [
+                'id' => $id,
+            ]);
         }
         
         public function setDatabase(&$database) {
@@ -252,8 +260,8 @@
 
             foreach($tree as $v) {
                 $this->database->execute('UPDATE level SET rel=:rel WHERE id=:id', [
-                    ':rel' => $v['rel'],
-                    ':id' => $v['id']
+                    'rel' => $v['rel'],
+                    'id' => $v['id']
                 ]);
             }
         }
@@ -271,16 +279,16 @@
                     $parent_id = isset($chat[$v['parent_id']]) ? $chat[$v['parent_id']]['level_id'] : $root['level_id'];
                     
                     $this->database->execute('UPDATE level SET parent_id=:parent_id WHERE id=:id', [
-                        ':parent_id' => $parent_id,
-                        ':id' => $v['level_id']
+                        'parent_id' => $parent_id,
+                        'id' => $v['level_id']
                     ]);
                 }
             }
         }
         
         protected function getChatRootLevel() {
-            if($root = $this->database->query("SELECT * FROM chat_level WHERE ent_id='{$this->opts['id']}' AND id=1 AND parent_id=0")) {
-                return array_shift($root);
+            if($root = $this->database->find("SELECT * FROM chat_level WHERE ent_id='{$this->opts['id']}' AND id=1 AND parent_id=0")) {
+                return $root;
             }
             
             throw new \Exception("服务器在验证企业微信顶层组织时，没能满足其中的一个。", 412);
@@ -289,8 +297,8 @@
         protected function getSysRootLevel() {
             $chat = $this->getChatRootLevel();
             
-            if($root = $this->database->query("SELECT * FROM level WHERE id={$chat['level_id']} AND parent_id=0")) {
-                return array_shift($root);
+            if($root = $this->database->find("SELECT * FROM level WHERE id={$chat['level_id']} AND parent_id=0")) {
+                return $root;
             }
             
             throw new \Exception("服务器在验证系统顶层组织时，没能满足其中的一个。", 412);

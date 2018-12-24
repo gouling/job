@@ -5,10 +5,10 @@
         public function __construct($config) {
             parent::__construct($config['dsn'], $config['username'], $config['password'], $config['options']);
         }
-        
+
         public function query($statement, $params = []) {
             $ds = $this->prepare($statement);
-            if($ds->execute($params) == true) {
+            if($ds->execute($this->getParams($params)) == true) {
                 return $ds->fetchAll(self::FETCH_ASSOC);
             } else {
                 throw new \Exception(implode('->', $ds->errorInfo()), 500);
@@ -18,7 +18,7 @@
         public function execute($statement, $params = []) {
             $ds = $this->prepare($statement);
             
-            if($ds->execute($params) == true) {
+            if($ds->execute($this->getParams($params)) == true) {
                 return [
                     'affected_rows' => $ds->rowCount(),
                     'last_insert_id' => (int)$this->lastInsertId()
@@ -68,13 +68,19 @@
             }
         }
         
+                
+        public function find($statement, $params = []) {
+            if($data = $this->query($statement, $params)) {
+                return array_shift($data);
+            }
+        }
+        
         public function create($table, $params) {
             $columns = implode(',', array_keys($params));
             foreach($params as $k=>$v) {
-                $values[$k] = ':' . $k;
-                $params[$values[$k]] = $v;
-                unset($params[$k]);
+                $values[] = ':' . $k;
             }
+            
             $values = implode(',', $values);
             $query = "INSERT INTO {$table}({$columns}) VALUES ({$values})";
             
@@ -82,14 +88,13 @@
         }
         
         public function update($table, $params) {
+            $values = [];
             foreach($params as $k=>$v) {
-                $columns[$k] = $k . '=:' . $k;
-                $params[':' . $k] = $v;
-                unset($params[$k]);
+                $values[$k] = $k . '=:' . $k;
             }
-            $columns = implode(',', $columns);
-            $query = "UPDATE {$table} SET {$columns} WHERE id=:id";
-            
+            $values = implode(',', $values);
+            $query = "UPDATE {$table} SET {$values} WHERE id=:id";
+
             return $this->execute($query, $params);
         }
         

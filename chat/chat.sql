@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.24-log)
 # Database: sync
-# Generation Time: 2018-12-24 07:36:09 +0000
+# Generation Time: 2018-12-24 08:49:22 +0000
 # ************************************************************
 
 
@@ -75,6 +75,19 @@ CREATE TABLE `level` (
   `parent_id` int(11) NOT NULL,
   `rel` varchar(512) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table level_user
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `level_user`;
+
+CREATE TABLE `level_user` (
+  `level_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`level_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
