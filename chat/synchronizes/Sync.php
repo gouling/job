@@ -105,7 +105,7 @@
                 } else {
                     $this->database->update('chat_ent', $auth);
                     // 移除不可见层信息
-                    if($deleted = array_diff(explode(',', $ent['departs']), [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,27])) {
+                    if($deleted = array_diff(explode(',', $ent['departs']), explode(',', $auth['departs']))) {
                         $departs = array_column($this->database->query("SELECT level_id FROM chat_level WHERE ent_id='{$this->opts['id']}' AND id IN (" . implode(',', $deleted) . ")"), 'level_id');
                         $this->deleteLevel($departs);
                     }
