@@ -46,7 +46,7 @@
         public function level(&$items, $id, $parent_id) {
             $state = false;
             foreach($items as &$v) {
-                if($v[$id] == 1 && $v[$parent_id] == 0) {
+                if($v[$parent_id] == 0) {
                     $v['rel'] = $v[$id];
                 } else if(isset($items[$v[$parent_id]])) {
                     if(!empty($items[$v[$parent_id]]['rel'])) {
