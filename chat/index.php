@@ -19,3 +19,4 @@
     $sync->setDatabase($database);
     
     $sync->auth();
+    $sync->cancel();

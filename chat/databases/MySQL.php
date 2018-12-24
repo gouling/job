@@ -28,6 +28,12 @@
             }
         }
         
+        public function multi($statement) {
+            $query = implode(';', $statement);
+            
+            return $this->execute($query);
+        }
+        
         public function tree($items, $id, $parent_id) {
             $tree = [];
             $items = array_combine(array_column($items, $id), $items);
