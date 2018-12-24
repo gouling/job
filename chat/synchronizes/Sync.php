@@ -9,12 +9,16 @@
         public function cancel() {
             $trans = [
                 "DELETE FROM chat_ent WHERE id='{$this->opts['id']}'",
+                
                 "DELETE FROM level_user USING level_user,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level_user.level_id=chat_level.level_id",
                 "DELETE FROM level_user USING level_user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND level_user.user_id=chat_user.user_id",
+                
                 "DELETE FROM level USING level,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level.id=chat_level.level_id",
                 "DELETE FROM chat_level WHERE ent_id='{$this->opts['id']}'",
+                
                 "DELETE FROM user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND user.id=chat_user.user_id",
                 "DELETE FROM chat_user WHERE chat_user.ent_id='{$this->opts['id']}'",
+                
                 "ALTER TABLE level AUTO_INCREMENT=1",
                 "ALTER TABLE user AUTO_INCREMENT=1",
             ];
