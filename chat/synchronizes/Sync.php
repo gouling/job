@@ -105,7 +105,7 @@
                 } else {
                     $this->database->update('chat_ent', $auth);
                     // 移除不可见层信息
-                    if($deleted = array_diff(explode(',', $ent['departs']), explode(',', $auth['departs']))) {
+                    if($deleted = array_diff(explode(',', $ent['departs']), [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,27])) {
                         $departs = array_column($this->database->query("SELECT level_id FROM chat_level WHERE ent_id='{$this->opts['id']}' AND id IN (" . implode(',', $deleted) . ")"), 'level_id');
                         $this->deleteLevel($departs);
                     }
@@ -128,6 +128,7 @@
              * 成员在多个部门，此部门在最后
              * 成员无部门信息，移除微信接点
              * 成员无部门信息，移除系统成员信息
+             * 移除系统层级与系统成员间关系信息
              * 移除企业微信层级信息
              * 移除系统层级信息
              */
@@ -140,8 +141,9 @@
                 ]);
             }
             $trans = array_merge($trans, [
+                "DELETE FROM user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND user.id=chat_user.user_id AND user.level=''",
                 "DELETE FROM chat_user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND chat_user.user_id=user.id AND user.level=''",
-                "DELETE FROM user WHERE level=''",
+                "DELETE FROM level_user USING level_user,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level_user.level_id=chat_level.level_id AND level_user.level_id IN({$deleted})",
                 "DELETE FROM level USING level,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level.id=chat_level.level_id AND chat_level.level_id IN ({$deleted})",
                 "DELETE FROM chat_level WHERE ent_id='{$this->opts['id']}' AND level_id IN ({$deleted})"
             ]);
