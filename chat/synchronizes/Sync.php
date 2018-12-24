@@ -143,7 +143,7 @@
             $trans = array_merge($trans, [
                 "DELETE FROM user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND user.id=chat_user.user_id AND user.level=''",
                 "DELETE FROM chat_user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND chat_user.user_id=user.id AND user.level=''",
-                "DELETE FROM level_user USING level_user,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level_user.level_id=chat_level.level_id AND level_user.level_id IN({$deleted})",
+                "DELETE FROM level_user USING level_user,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level_user.level_id=chat_level.level_id AND level_user.level_id IN ({$deleted})",
                 "DELETE FROM level USING level,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level.id=chat_level.level_id AND chat_level.level_id IN ({$deleted})",
                 "DELETE FROM chat_level WHERE ent_id='{$this->opts['id']}' AND level_id IN ({$deleted})"
             ]);
