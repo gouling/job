@@ -124,9 +124,9 @@
                 ]);
             }
             $trans = array_merge($trans, [
-                "DELETE FROM chat_user USING user,chat_user WHERE chat_user.user_id=user.id AND chat_user.ent_id='{$this->opts['id']}' AND user.level=''",
+                "DELETE FROM chat_user USING user,chat_user WHERE chat_user.ent_id='{$this->opts['id']}' AND chat_user.user_id=user.id AND user.level=''",
                 "DELETE FROM user WHERE level=''",
-                "DELETE FROM level WHERE id IN ({$deleted})",
+                "DELETE FROM level USING level,chat_level WHERE chat_level.ent_id='{$this->opts['id']}' AND level.id=chat_level.level_id AND chat_level.level_id IN ({$deleted})",
                 "DELETE FROM chat_level WHERE ent_id='{$this->opts['id']}' AND level_id IN ({$deleted})"
             ]);
             $query = implode(';', $trans);
