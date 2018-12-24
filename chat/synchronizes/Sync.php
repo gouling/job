@@ -221,17 +221,16 @@
                 ]);
             }
             
-            foreach($user['level'] as $level_id) {
-                $this->updateLevelUser($level_id, $chat['user_id']);
-            }
+            $this->updateLevelUser($user['level'], $chat['user_id']);
         }
         
         public function updateLevelUser($level_id, $user_id) {
-            $data = compact('level_id', 'user_id');
-            
-            $rel = $this->database->find('SELECT * FROM level_user WHERE level_id=:level_id AND user_id=:user_id', $data);
-            if(is_null($rel)) {
-                $this->database->create('level_user', $data);
+            $this->database->execute("DELETE FROM level_user WHERE user_id={$user_id}");
+            foreach($level_id as $id) {
+                $this->database->create('level_user', [
+                    'level_id' => $id,
+                    'user_id' => $user_id
+                ]);
             }
         }
 
